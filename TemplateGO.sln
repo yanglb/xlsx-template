@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateGO", "TemplateGO\TemplateGO.csproj", "{8A307EC9-1C69-4FA3-AAE5-18A00CBD1532}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TemplateGO", "TemplateGO\TemplateGO.csproj", "{8A307EC9-1C69-4FA3-AAE5-18A00CBD1532}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateGOTests", "TemplateGOTests\TemplateGOTests.csproj", "{90A2757B-E0F8-4FDE-85C6-CEBB5C8EAD1D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{8A307EC9-1C69-4FA3-AAE5-18A00CBD1532}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A307EC9-1C69-4FA3-AAE5-18A00CBD1532}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A307EC9-1C69-4FA3-AAE5-18A00CBD1532}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90A2757B-E0F8-4FDE-85C6-CEBB5C8EAD1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90A2757B-E0F8-4FDE-85C6-CEBB5C8EAD1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90A2757B-E0F8-4FDE-85C6-CEBB5C8EAD1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90A2757B-E0F8-4FDE-85C6-CEBB5C8EAD1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
