@@ -1,0 +1,23 @@
+﻿{
+  "name": "测试名称",
+  "age": 32,
+  "score": 46.5,
+  "hasPhone": true,
+  "home": "首页",
+  "homeLink": "https://yanglb.com",
+  "school": {
+    "name": "学校名称"
+  },
+  "parents": [
+    {
+      "id": 1,
+      "name": "父亲姓名",
+      "email": "father@yanglb.com"
+    },
+    {
+      "id": 2,
+      "name": "母亲姓名",
+      "email": "mother@yanglb.com"
+    }
+  ]
+}
