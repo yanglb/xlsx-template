@@ -1,30 +1,22 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
+using TemplateGOTests;
 
 namespace TemplateGO.Tests
 {
     [TestClass()]
     public class UtilsTests
     {
-        private static string jsonString = @"{
-""hospital"": {""name"": ""测试医院""},
-""parents"": [{
-    ""name"": ""父亲姓名"",
-    ""age"": 47
-},{
-    ""name"": ""母亲姓名"",
-    ""age"": 50
-}],
-""phone"": ""18602507915"",
-""height"": 48.5,
-""weight"": 3,
-""isNamed"": false,
-""hasPhone"": true,
-""school"": null
-}";
+        private JsonElement Json { get { return JsonFromFile("data/utils.json"); } }
 
-        private JsonElement Json = JsonDocument.Parse(jsonString)!.RootElement;
+        private JsonElement JsonFromFile(string file)
+        {
+            var fullPath = R.FullPath(file);
+            var jsonString = File.ReadAllText(fullPath);
+            return JsonDocument.Parse(jsonString)!.RootElement;
+        }
 
         [TestMethod()]
         public void GetValueTestL1()

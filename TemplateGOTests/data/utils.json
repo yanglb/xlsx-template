@@ -1,0 +1,21 @@
+{
+  "hospital": {
+    "name": "测试医院"
+  },
+  "parents": [
+    {
+      "name": "父亲姓名",
+      "age": 47
+    },
+    {
+      "name": "母亲姓名",
+      "age": 50
+    }
+  ],
+  "phone": "18602507915",
+  "height": 48.5,
+  "weight": 3,
+  "isNamed": false,
+  "hasPhone": true,
+  "school": null
+}
