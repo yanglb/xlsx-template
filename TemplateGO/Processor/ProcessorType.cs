@@ -8,7 +8,7 @@
         /// <summary>
         /// 值处理
         /// </summary>
-        public const string Value = "";
+        public const string Value = "value";
 
         /// <summary>
         /// 超连接
