@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace TemplateGO
+namespace TemplateGO.Renders
 {
     internal interface IRender
     {
