@@ -7,7 +7,7 @@ using TemplateGOTests;
 namespace TemplateGO.Tests
 {
     [TestClass()]
-    public class ProcHyperlinkTest
+    public class ProcHyperlinkTests
     {
         [TestMethod()]
         public void HyperlinkTest()
