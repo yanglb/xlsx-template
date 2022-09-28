@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using System.IO;
 using System.Text.Json;
 using TemplateGOTests;
 
@@ -9,14 +8,7 @@ namespace TemplateGO.Tests
     [TestClass()]
     public class UtilsTests
     {
-        private JsonElement Json { get { return JsonFromFile("data/utils.json"); } }
-
-        private JsonElement JsonFromFile(string file)
-        {
-            var fullPath = R.FullPath(file);
-            var jsonString = File.ReadAllText(fullPath);
-            return JsonDocument.Parse(jsonString)!.RootElement;
-        }
+        private JsonElement Json { get { return R.JsonFromFile("data/utils.json"); } }
 
         [TestMethod()]
         public void GetValueTestL1()

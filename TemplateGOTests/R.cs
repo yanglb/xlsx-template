@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
 
 namespace TemplateGOTests
 {
@@ -25,6 +26,18 @@ namespace TemplateGOTests
         {
             var path = Path.Join(AppDir, "../../..", relativeProjPath);
             return Path.GetFullPath(path);
+        }
+
+        /// <summary>
+        /// 从测试数据中获取json内容
+        /// </summary>
+        /// <param name="file">JSON文件路径</param>
+        /// <returns>JSON内容 RootElement</returns>
+        internal static JsonElement JsonFromFile(string file)
+        {
+            var fullPath = R.FullPath(file);
+            var jsonString = File.ReadAllText(fullPath);
+            return JsonDocument.Parse(jsonString)!.RootElement;
         }
     }
 }
