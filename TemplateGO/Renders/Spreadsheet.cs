@@ -74,10 +74,15 @@ namespace TemplateGO.Renders
         private void ReplaceSheet(WorkbookPart workbookPart, Sheet sheet, JsonElement data, SharedStringTable? sharedStringTable)
         {
             WorksheetPart? wsPart = workbookPart.GetPartById(sheet.Id?.Value ?? "") as WorksheetPart;
+            if (wsPart == null)
+            {
+                Console.WriteLine($"未发现该Sheet {sheet.Name} 的WorksheetPart内容。");
+                return;
+            }
 
             // 找出全部有效标识的单元格
             // ${key[|proc[:[settingKey1=settingValue1],[settingKey2=settingValue2]]}
-            var cells = wsPart?.Worksheet.Descendants<Cell>().Where(cell =>
+            var cells = wsPart.Worksheet.Descendants<Cell>().Where(cell =>
             {
                 var value = Utils.GetCellString(cell, sharedStringTable);
                 if (string.IsNullOrEmpty(value)) return false;
@@ -102,7 +107,18 @@ namespace TemplateGO.Renders
                     if (processor == null) continue;
 
                     // 处理
-                    processor.Process(cell, cellValue, parser, sheet, data, sharedStringTable);
+                    // cell, cellValue, parser, sheet, data, sharedStringTable
+                    processor.Process(new ProcessParams()
+                    {
+                        Cell = cell,
+                        OriginValue = cellValue,
+                        Parser = parser,
+                        Sheet = sheet,
+                        Data = data,
+                        SharedStringTable = sharedStringTable,
+                        WorkbookPart = workbookPart,
+                        WorksheetPart = wsPart
+                    });
                 }
             }
         }
