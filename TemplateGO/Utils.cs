@@ -55,7 +55,7 @@ namespace TemplateGO
             switch (value.ValueKind)
             {
                 case JsonValueKind.Number:
-                    // 有小数返回 flot
+                    // 有小数返回 Double 否则返回 int
                     if (value.GetRawText().Contains('.')) return value.GetDouble();
                     return value.GetInt32();
 
@@ -71,6 +71,7 @@ namespace TemplateGO
                     return null;
             }
 
+            // Array/Object 直接返回
             return value;
         }
     }
