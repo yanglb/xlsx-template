@@ -11,7 +11,7 @@
         public const string Value = "value";
 
         /// <summary>
-        /// 超连接
+        /// 超链接
         /// </summary>
         public const string Hyperlink = "link";
 

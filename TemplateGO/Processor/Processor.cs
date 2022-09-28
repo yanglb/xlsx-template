@@ -5,7 +5,7 @@
         private static Dictionary<string, Type> ProcessorTypeMap = new Dictionary<string, Type>()
         {
             {ProcessorType.Value, typeof(ValueProcess) },
-            {ProcessorType.Hyperlink, typeof(ValueProcess) },
+            {ProcessorType.Hyperlink, typeof(HyperlinkProcess) },
         };
 
         /// <summary>

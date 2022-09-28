@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.Json;
 
 namespace TemplateGO.Processor
@@ -8,11 +9,22 @@ namespace TemplateGO.Processor
         /// <summary>
         /// 处理模板内容
         /// </summary>
-        /// <param name="cell">单元格</param>
-        /// <param name="originValue">单元格原始值</param>
-        /// <param name="parser">解析器</param>
-        /// <param name="sheet">所属Sheet</param>
-        /// <param name="data">数据</param>
-        internal void Process(Cell cell, string originValue, Parser parser, Sheet sheet, JsonElement data, SharedStringTable? sharedStringTable);
+        /// <param name="processParams">参数</param>
+        internal void Process(ProcessParams processParams);
+    }
+
+    /// <summary>
+    /// 处理程序参数
+    /// </summary>
+    internal struct ProcessParams
+    {
+        public Cell Cell { get; set; }
+        public string OriginValue { get; set; }
+        public Parser Parser { get; set; }
+        public Sheet Sheet { get; set; }
+        public JsonElement Data { get; set; }
+        public SharedStringTable? SharedStringTable { get; set; }
+        public WorkbookPart WorkbookPart { get; set; }
+        public WorksheetPart WorksheetPart { get; set; }
     }
 }
