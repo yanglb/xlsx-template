@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using System;
 using System.IO;
 using System.Text.Json;
 
@@ -10,12 +10,8 @@ namespace TemplateGOTests
         {
             get
             {
-                var file = Process.GetCurrentProcess().MainModule?.FileName;
-
-                // 不存在返回当前路径
-                if (string.IsNullOrEmpty(file)) return "";
-
-                return Path.GetDirectoryName(file) ?? "";
+                var executablePath = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+                return executablePath ?? "";
             }
         }
 
