@@ -3,6 +3,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using TemplateGO.Processor;
 
 namespace TemplateGO.Renders
 {
@@ -12,9 +13,9 @@ namespace TemplateGO.Renders
     internal class Spreadsheet : IRender
     {
         /// <summary>
-        /// Excel 种类
+        /// 支持的文件种类
         /// </summary>
-        private static Dictionary<string, SpreadsheetDocumentType> SheetTypeMap = new()
+        private static readonly Dictionary<string, SpreadsheetDocumentType> SheetTypeMap = new()
         {
             { ".xlsx", SpreadsheetDocumentType.Workbook },
             { ".xltx", SpreadsheetDocumentType.Template },
@@ -28,8 +29,8 @@ namespace TemplateGO.Renders
             using (SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(templatePath, true))
             {
                 // 后缀不一致时修改文档类型
-                var newType = (Path.GetExtension(targetType)?.ToLower())??"";
-                if (string.Compare( Path.GetExtension(templatePath), newType, true) != 0)
+                var newType = (Path.GetExtension(targetType)?.ToLower()) ?? "";
+                if (string.Compare(Path.GetExtension(templatePath), newType, true) != 0)
                 {
                     Console.WriteLine($"转换文件类型为 {newType}");
                     if (!SheetTypeMap.ContainsKey(newType)) throw new ArgumentException($"未知的目标文档类型 {newType}");
@@ -55,7 +56,22 @@ namespace TemplateGO.Renders
             }
         }
 
-        private static void ReplaceSheet(WorkbookPart workbookPart, Sheet sheet, JsonElement data, SharedStringTable? sharedStringTable)
+        /// <summary>
+        /// 处理器缓存
+        /// </summary>
+        private Dictionary<string, IProcessor?> ProcessorCache = new();
+        private IProcessor? ProcessorByType(string type)
+        {
+            if (!ProcessorCache.ContainsKey(type))
+            {
+                var processor = Processor.Processor.ProcessorByType(type);
+                ProcessorCache[type] = processor;
+            }
+
+            return ProcessorCache[type];
+        }
+
+        private void ReplaceSheet(WorkbookPart workbookPart, Sheet sheet, JsonElement data, SharedStringTable? sharedStringTable)
         {
             WorksheetPart? wsPart = workbookPart.GetPartById(sheet.Id?.Value ?? "") as WorksheetPart;
 
@@ -63,7 +79,7 @@ namespace TemplateGO.Renders
             // ${key[|proc[:[settingKey1=settingValue1],[settingKey2=settingValue2]]}
             var cells = wsPart?.Worksheet.Descendants<Cell>().Where(cell =>
             {
-                var value = CellString(cell, sharedStringTable);
+                var value = Utils.GetCellString(cell, sharedStringTable);
                 if (string.IsNullOrEmpty(value)) return false;
                 return Regex.IsMatch(value, @"\${[^}]+}+");
             });
@@ -72,85 +88,23 @@ namespace TemplateGO.Renders
 
             foreach (var cell in cells)
             {
-                var cellValue = CellString(cell, sharedStringTable);
+                var cellValue = Utils.GetCellString(cell, sharedStringTable);
                 var matchs = Regex.Matches(cellValue, @"\${([^}]+)+}");
                 if (matchs == null || matchs.Count == 0)
                 {
                     throw new Exception($"无法处理单元格: {cell.CellReference} => {cellValue}");
                 }
-                // 暂时只处理第1个
-                if (matchs.Count == 1)
+
+                foreach (Match match in matchs)
                 {
-                    var match = matchs[0]!;
-                    var prop = match.Groups[1].Value?.Split('|')!;
+                    var parser = new Parser(match.Value);
+                    var processor = ProcessorByType(parser.Processor);
+                    if (processor == null) continue;
 
-                    // 属性key
-                    var key = prop[0]!;
-
-                    // 处理器
-                    var proc = prop.Count() > 1 ? prop[1]! : null;
-                    object? value = null;
-                    try
-                    {
-                        value = Utils.GetValue(data, key);
-                    }
-                    catch (Exception)
-                    {
-                    }
-
-                    // 空值
-                    if (value == null)
-                    {
-                        cell.CellValue = null;
-                        cell.DataType = null;
-                    }
-
-                    else if (value.GetType() == typeof(int))
-                    {
-                        cell.CellValue = new CellValue((int)value);
-                        cell.DataType = CellValues.Number;
-                    }
-                    else if (value.GetType() == typeof(double))
-                    {
-                        cell.CellValue = new CellValue((double)value);
-                        cell.DataType = CellValues.Number;
-                    }
-                    else if (value.GetType() == typeof(bool))
-                    {
-                        cell.CellValue = new CellValue((bool)value);
-                        cell.DataType = CellValues.Boolean;
-                    }
-                    else if (value.GetType() == typeof(string))
-                    {
-                        cell.CellValue = new CellValue((string)value);
-                        cell.DataType = CellValues.String;
-                    }
-
-                    // 无法解析的对象
-                    else/*if (value.GetType() == typeof(JsonElement))*/
-                    {
-                        cell.CellValue = new CellValue("[object Object]");
-                        cell.DataType = CellValues.String;
-                    }
+                    // 处理
+                    processor.Process(cell, cellValue, parser, sheet, data, sharedStringTable);
                 }
-                //Console.WriteLine($"cell {cell.CellReference}: {cellValue}");
-
-                //cell.CellValue = new CellValue(12.5);
-                //cell.DataType = CellValues.Number;
             }
-        }
-
-        private static string CellString(Cell cell, SharedStringTable? sharedStringTable)
-        {
-            var value = cell.InnerText;
-            if (string.IsNullOrEmpty(value)) return "";
-
-            // 从 SharedStringTable 中获取
-            if (cell.DataType != null && cell.DataType == CellValues.SharedString && sharedStringTable != null)
-            {
-                value = sharedStringTable.ElementAt(int.Parse(value)).InnerText;
-            }
-            return value;
         }
     }
 }
