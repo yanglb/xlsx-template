@@ -4,12 +4,33 @@ namespace TemplateGO
 {
     public static class TemplateGO
     {
+        /// <summary>
+        /// 渲染模板
+        /// </summary>
+        /// <param name="templatePath">模板路径</param>
+        /// <param name="jsonString">JSON字符数据</param>
+        /// <param name="saveTo">输出文件</param>
+        public static void Render(string templatePath, string jsonString, string saveTo)
+        {
+            var jd = JsonDocument.Parse(jsonString)!.RootElement;
+            Render(templatePath, jd, saveTo);
+        }
+
+        /// <summary>
+        /// 渲染模板
+        /// </summary>
+        /// <param name="templatePath">模板路径</param>
+        /// <param name="data">数据</param>
+        /// <param name="saveTo">输出文件</param>
         public static void Render(string templatePath, JsonElement data, string saveTo)
         {
+            if (data.ValueKind != JsonValueKind.Object) throw new ArgumentException("仅支持根对象为Object类型的数据。");
+
             // 检查模板类型
             var srcExtension = Path.GetExtension(templatePath).ToLower();
             var trgExtension = Path.GetExtension(saveTo).ToLower();
-            if (string.IsNullOrEmpty(srcExtension) || string.IsNullOrEmpty(trgExtension)) {
+            if (string.IsNullOrEmpty(srcExtension) || string.IsNullOrEmpty(trgExtension))
+            {
                 throw new ArgumentException("未知模板类型。");
             }
 
