@@ -6,6 +6,7 @@
         {
             {ProcessorType.Value, typeof(ProcValue) },
             {ProcessorType.Hyperlink, typeof(ProcHyperlink) },
+            {ProcessorType.Image, typeof(ProcImage) },
         };
 
         /// <summary>
