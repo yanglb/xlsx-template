@@ -2,8 +2,9 @@
 using System;
 using System.IO;
 using System.Text;
+using TemplateGO.Utils;
 
-namespace TemplateGO.Tests
+namespace TemplateGO.Tests.Utils
 {
     [TestClass()]
     public class ImageUtilsTests

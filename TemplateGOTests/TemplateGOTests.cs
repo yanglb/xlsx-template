@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using TemplateGO.Utils;
 using TemplateGOTests;
 
 namespace TemplateGO.Tests
@@ -46,7 +47,7 @@ namespace TemplateGO.Tests
                 {
                     if (!cellValues.ContainsKey(cell.CellReference!)) continue;
 
-                    var value = Utils.GetCellString(cell, ssTable);
+                    var value = CellUtils.GetCellString(cell, ssTable);
                     Assert.AreEqual(cellValues[cell.CellReference!], value);
                 }
             }

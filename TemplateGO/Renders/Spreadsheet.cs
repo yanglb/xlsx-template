@@ -4,6 +4,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TemplateGO.Processor;
+using TemplateGO.Utils;
 
 namespace TemplateGO.Renders
 {
@@ -80,18 +81,18 @@ namespace TemplateGO.Renders
 
             // 找出全部有效标识的单元格
             // ${key[|proc[:[settingKey1=settingValue1],[settingKey2=settingValue2]]}
-            var cells = wsPart.Worksheet.Descendants<Cell>().Where(cell =>
+            var cells = wsPart.Worksheet.Descendants<Cell>().Where((Func<Cell, bool>)(cell =>
             {
-                var value = Utils.GetCellString(cell, sharedStringTable);
+                var value = CellUtils.GetCellString(cell, sharedStringTable);
                 if (string.IsNullOrEmpty(value)) return false;
                 return Regex.IsMatch(value, @"\${[^}]+}+");
-            });
+            }));
             Console.WriteLine($"Sheet {sheet.Name} 中共发现 {cells?.Count() ?? 0} 个单元格需要处理。");
             if (cells == null) return;
 
             foreach (var cell in cells)
             {
-                var cellValue = Utils.GetCellString(cell, sharedStringTable);
+                var cellValue = CellUtils.GetCellString(cell, sharedStringTable);
                 var matchs = Regex.Matches(cellValue, @"\${([^}]+)+}");
                 if (matchs == null || matchs.Count == 0)
                 {

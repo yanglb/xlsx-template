@@ -1,6 +1,7 @@
-﻿using System.Text.RegularExpressions;
+﻿using DocumentFormat.OpenXml.Packaging;
+using System.Text.RegularExpressions;
 
-namespace TemplateGO
+namespace TemplateGO.Utils
 {
     public static class ImageUtils
     {
@@ -26,6 +27,36 @@ namespace TemplateGO
 
             // 其它当作文件处理
             return image;
+        }
+
+        // 代码来自 ImagePartTypeInfo
+        public static ImagePartType GetImagePartType(string extension)
+        {
+            switch (extension.ToLower())
+            {
+                case ".bmp":
+                    return ImagePartType.Bmp;
+                case ".emf":
+                    return ImagePartType.Emf;
+                case ".ico":
+                    return ImagePartType.Icon;
+                case ".jpg":
+                    return ImagePartType.Jpeg;
+                case ".jpeg":
+                    return ImagePartType.Jpeg;
+                case ".pcx":
+                    return ImagePartType.Pcx;
+                case ".png":
+                    return ImagePartType.Png;
+                case ".svg":
+                    return ImagePartType.Svg;
+                case ".tiff":
+                    return ImagePartType.Tiff;
+                case ".wmf":
+                    return ImagePartType.Wmf;
+                default:
+                    throw new NotSupportedException(extension + " is not supported");
+            }
         }
 
         /// <summary>

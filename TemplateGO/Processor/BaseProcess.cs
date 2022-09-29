@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using TemplateGO.Utils;
 
 namespace TemplateGO.Processor
 {
@@ -27,7 +28,7 @@ namespace TemplateGO.Processor
             {
                 if (!string.IsNullOrEmpty(property))
                 {
-                    return Utils.GetValue(data, property);
+                    return JsonUtils.GetValue(data, property);
                 }
             }
             // 数据中不存在时视为 null
@@ -77,7 +78,7 @@ namespace TemplateGO.Processor
 
         protected void SetCellValuePart(Cell cell, string match, object? value, SharedStringTable? sharedStringTable)
         {
-            var currentValue = Utils.GetCellString(cell, sharedStringTable);
+            var currentValue = CellUtils.GetCellString(cell, sharedStringTable);
             var newValue = ReplaceCellValue(currentValue, match, value);
 
             // 设置值及类型

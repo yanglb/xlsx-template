@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using TemplateGO.Utils;
 using TemplateGOTests;
 
 namespace TemplateGO.Tests
@@ -35,12 +36,12 @@ namespace TemplateGO.Tests
                 var cell = sheet1Part.Worksheet.Descendants<Cell>().Where(cell => cell.CellReference == "B3").FirstOrDefault();
                 Assert.IsNotNull(cell);
                 Assert.IsTrue(CellValues.String == cell.DataType!, cell.CellReference);
-                Assert.AreEqual("测试名称", Utils.GetCellString(cell, ssTable), cell.CellReference);
+                Assert.AreEqual("测试名称", CellUtils.GetCellString(cell, ssTable), cell.CellReference);
 
                 cell = sheet1Part.Worksheet.Descendants<Cell>().Where(cell => cell.CellReference == "B4").FirstOrDefault();
                 Assert.IsNotNull(cell);
                 Assert.IsTrue(CellValues.String == cell.DataType!, cell.CellReference);
-                Assert.AreEqual("测试名称测试名称", Utils.GetCellString(cell, ssTable), cell.CellReference);
+                Assert.AreEqual("测试名称测试名称", CellUtils.GetCellString(cell, ssTable), cell.CellReference);
 
                 cell = sheet1Part.Worksheet.Descendants<Cell>().Where(cell => cell.CellReference == "B5").FirstOrDefault();
                 Assert.IsNotNull(cell);
@@ -91,12 +92,12 @@ namespace TemplateGO.Tests
                 cell = sheet1Part.Worksheet.Descendants<Cell>().Where(cell => cell.CellReference == "B17").FirstOrDefault();
                 Assert.IsNotNull(cell);
                 Assert.IsTrue(CellValues.SharedString == cell.DataType!, cell.CellReference);
-                Assert.AreEqual("${name|nono}", Utils.GetCellString(cell, ssTable), cell.CellReference);
+                Assert.AreEqual("${name|nono}", CellUtils.GetCellString(cell, ssTable), cell.CellReference);
 
                 cell = sheet1Part.Worksheet.Descendants<Cell>().Where(cell => cell.CellReference == "B18").FirstOrDefault();
                 Assert.IsNotNull(cell);
                 Assert.IsTrue(CellValues.SharedString == cell.DataType!, cell.CellReference);
-                Assert.AreEqual("${name|nono}原样保留", Utils.GetCellString(cell, ssTable), cell.CellReference);
+                Assert.AreEqual("${name|nono}原样保留", CellUtils.GetCellString(cell, ssTable), cell.CellReference);
 
                 // 属性为存在时
                 cell = sheet1Part.Worksheet.Descendants<Cell>().Where(cell => cell.CellReference == "B19").FirstOrDefault();
