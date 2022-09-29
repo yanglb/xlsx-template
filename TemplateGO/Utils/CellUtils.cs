@@ -24,9 +24,19 @@ namespace TemplateGO.Utils
         /// <summary>
         /// 获取行值，从1开始 如 A10 返回10, B5 返回 5
         /// </summary>
-        public static int? RowValue(string? cellReference)
+        public static int RowValue(string cellReference)
         {
-            if (string.IsNullOrEmpty(cellReference)) return null;
+            var match = Regex.Match(cellReference, @"(\d+)");
+            if (!match.Success) throw new ArgumentException("cellReference 为空");
+            return int.Parse(match.Groups[1].Value);
+        }
+
+        /// <summary>
+        /// 获取列值，从1开始 如 A10 返回1, B5 返回 2
+        /// </summary>
+        public static int ColumnValue(string cellReference)
+        {
+            if (string.IsNullOrEmpty(cellReference)) throw new ArgumentException("cellReference 为空");
             string columnReference = Regex.Replace(cellReference.ToUpper(), @"[\d]", string.Empty);
 
             int columnNumber = -1;
@@ -38,25 +48,12 @@ namespace TemplateGO.Utils
             foreach (char c in columnReference.ToCharArray().Reverse())
             {
                 columnNumber += mulitplier * ((int)c - 64);
-
-                mulitplier = mulitplier * 26;
+                mulitplier *= 26;
             }
 
             //the result is zero based so return columnnumber + 1 for a 1 based answer
             //this will match Excel's COLUMN function
             return columnNumber + 1;
         }
-
-        /// <summary>
-        /// 获取列值，从1开始 如 A10 返回1, B5 返回 2
-        /// </summary>
-        public static int? ColumnValue(string? cellReference)
-        {
-            if (string.IsNullOrEmpty(cellReference)) return null;
-            var match = Regex.Match(cellReference, @"(\d+)");
-            if (!match.Success) return null;
-            return int.Parse(match.Groups[1].Value);
-        }
-
     }
 }
