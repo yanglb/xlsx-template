@@ -20,7 +20,7 @@ namespace TemplateGOTests
         /// </summary>
         internal static string FullPath(string relativeProjPath)
         {
-            var path = Path.Join(AppDir, "../../..", relativeProjPath);
+            var path = Path.Combine(AppDir, "../../..", relativeProjPath);
             return Path.GetFullPath(path);
         }
 

@@ -17,7 +17,7 @@ namespace TemplateGO
             var render = Renders.Render.RenderByExtension(srcExtension);
 
             // 处理模板文件
-            var tempFile = Path.Join(Path.GetTempPath(), Path.GetRandomFileName() + "-" + Path.GetFileName(templatePath));
+            var tempFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + "-" + Path.GetFileName(templatePath));
             File.Copy(templatePath, tempFile);
 
             // 渲染
