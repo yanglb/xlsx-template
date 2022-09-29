@@ -26,34 +26,33 @@ namespace TemplateGO.Renders
 
         public void Render(string templatePath, JsonElement data, string? targetType)
         {
-            using (SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(templatePath, true))
+            using SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(templatePath, true);
+
+            // 后缀不一致时修改文档类型
+            var newType = (Path.GetExtension(targetType)?.ToLower()) ?? "";
+            if (string.Compare(Path.GetExtension(templatePath), newType, true) != 0)
             {
-                // 后缀不一致时修改文档类型
-                var newType = (Path.GetExtension(targetType)?.ToLower()) ?? "";
-                if (string.Compare(Path.GetExtension(templatePath), newType, true) != 0)
-                {
-                    Console.WriteLine($"转换文件类型为 {newType}");
-                    if (!SheetTypeMap.ContainsKey(newType)) throw new ArgumentException($"未知的目标文档类型 {newType}");
-                    spreadsheetDocument.ChangeDocumentType(SheetTypeMap[newType]);
-                    spreadsheetDocument.Save();
-                }
-
-                var workbookPart = spreadsheetDocument.WorkbookPart;
-                if (workbookPart == null) throw new ArgumentException("模板格式错误: WorkbookPart 为空");
-                var stringTable = workbookPart.GetPartsOfType<SharedStringTablePart>().FirstOrDefault()?.SharedStringTable;
-
-                // 处理全部Sheet
-                var sheets = workbookPart.Workbook.Descendants<Sheet>();
-                if (sheets == null) throw new ArgumentException("模板格式错误: Sheet 为空");
-                foreach (var sheet in sheets)
-                {
-                    ReplaceSheet(workbookPart, sheet, data, stringTable);
-                }
-
-                // 保存工作表
-                workbookPart.Workbook.Save();
+                Console.WriteLine($"转换文件类型为 {newType}");
+                if (!SheetTypeMap.ContainsKey(newType)) throw new ArgumentException($"未知的目标文档类型 {newType}");
+                spreadsheetDocument.ChangeDocumentType(SheetTypeMap[newType]);
                 spreadsheetDocument.Save();
             }
+
+            var workbookPart = spreadsheetDocument.WorkbookPart;
+            if (workbookPart == null) throw new ArgumentException("模板格式错误: WorkbookPart 为空");
+            var stringTable = workbookPart.GetPartsOfType<SharedStringTablePart>().FirstOrDefault()?.SharedStringTable;
+
+            // 处理全部Sheet
+            var sheets = workbookPart.Workbook.Descendants<Sheet>();
+            if (sheets == null) throw new ArgumentException("模板格式错误: Sheet 为空");
+            foreach (var sheet in sheets)
+            {
+                ReplaceSheet(workbookPart, sheet, data, stringTable);
+            }
+
+            // 保存工作表
+            workbookPart.Workbook.Save();
+            spreadsheetDocument.Save();
         }
 
         /// <summary>
@@ -73,8 +72,7 @@ namespace TemplateGO.Renders
 
         private void ReplaceSheet(WorkbookPart workbookPart, Sheet sheet, JsonElement data, SharedStringTable? sharedStringTable)
         {
-            WorksheetPart? wsPart = workbookPart.GetPartById(sheet.Id?.Value ?? "") as WorksheetPart;
-            if (wsPart == null)
+            if (workbookPart.GetPartById(sheet.Id?.Value ?? "") is not WorksheetPart wsPart)
             {
                 Console.WriteLine($"未发现该Sheet {sheet.Name} 的WorksheetPart内容。");
                 return;
