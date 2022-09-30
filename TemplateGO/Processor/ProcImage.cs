@@ -29,7 +29,7 @@ namespace TemplateGO.Processor
             }
         }
 
-        protected string GetImageLocalFile(string image, ImageOptions options)
+        protected virtual string GetImageLocalFile(string image, ImageOptions options)
         {
             return ImageUtils.ToLocalFile(image);
         }

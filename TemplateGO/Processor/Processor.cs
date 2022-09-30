@@ -7,6 +7,7 @@
             {ProcessorType.Value, typeof(ProcValue) },
             {ProcessorType.Hyperlink, typeof(ProcHyperlink) },
             {ProcessorType.Image, typeof(ProcImage) },
+            {ProcessorType.QRCode, typeof(ProcQRCode) },
         };
 
         /// <summary>
