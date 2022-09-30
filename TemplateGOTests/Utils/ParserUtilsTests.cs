@@ -42,5 +42,15 @@ namespace TemplateGO.Utils.Tests
         {
             Assert.ThrowsException<ArgumentException>(() => ParserUtils.ValueToEmu(value, unit));
         }
+
+        [DataRow("1cm", 360000)]
+        [DataRow("1in", 914400)]
+        [DataRow("1px", 9525)]
+        [TestMethod()]
+        public void ParserValueToEmuTest(string input, long result)
+        {
+            var actual = ParserUtils.ParseValueToEmu(input);
+            Assert.AreEqual(result, actual);
+        }
     }
 }

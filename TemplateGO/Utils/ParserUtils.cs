@@ -54,5 +54,16 @@ namespace TemplateGO.Utils
                     throw new ArgumentException($"无法将 {unit} 转换为Emu");
             }
         }
+
+        /// <summary>
+        /// 解析输入值到 Emu 单位
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static long ParseValueToEmu(string input)
+        {
+            ValueWithUnit(input, out string value, out string unit);
+            return ValueToEmu(value, unit);
+        }
     }
 }
