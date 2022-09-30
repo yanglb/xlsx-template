@@ -3,6 +3,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using TemplateGO.Parser;
 using TemplateGO.Processor;
 using TemplateGO.Utils;
 
@@ -101,7 +102,7 @@ namespace TemplateGO.Renders
 
                 foreach (Match match in matchs)
                 {
-                    var parser = new Parser(match.Value);
+                    var parser = new Grammar(match.Value);
                     var processor = ProcessorByType(parser.Processor);
                     if (processor == null) continue;
 

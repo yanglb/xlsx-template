@@ -1,13 +1,13 @@
 ﻿using TemplateGO.Processor;
 
-namespace TemplateGO
+namespace TemplateGO.Parser
 {
-    public class Parser
+    public class Grammar
     {
         /// <summary>
         /// 解析器语法 ${key[|proc[:[settingKey1=settingValue1],[settingKey2=settingValue2]]}
         /// </summary>
-        public Parser(string content)
+        public Grammar(string content)
         {
             if (!content.StartsWith("${") || !content.EndsWith("}"))
             {

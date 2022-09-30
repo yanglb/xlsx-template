@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.Json;
+using TemplateGO.Parser;
 
 namespace TemplateGO.Processor
 {
@@ -20,7 +21,7 @@ namespace TemplateGO.Processor
     {
         public Cell Cell { get; set; }
         public string OriginValue { get; set; }
-        public Parser Parser { get; set; }
+        public Grammar Parser { get; set; }
         public Sheet Sheet { get; set; }
         public JsonElement Data { get; set; }
         public SharedStringTable? SharedStringTable { get; set; }

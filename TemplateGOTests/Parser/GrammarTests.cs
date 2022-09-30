@@ -1,25 +1,26 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using TemplateGO.Parser;
 
-namespace TemplateGO.Tests
+namespace TemplateGO.Tests.Parser
 {
     [TestClass()]
-    public class ParserTests
+    public class GrammarTests
     {
         [TestMethod()]
-        public void ParserTestBadContent()
+        public void GrammarTestBadContent()
         {
-            Assert.ThrowsException<ArgumentException>(() => new Parser(""));
-            Assert.ThrowsException<ArgumentException>(() => new Parser("hello"));
-            Assert.ThrowsException<ArgumentException>(() => new Parser("hello}"));
-            Assert.ThrowsException<ArgumentException>(() => new Parser("{hello}"));
-            Assert.ThrowsException<ArgumentException>(() => new Parser("$hello}"));
+            Assert.ThrowsException<ArgumentException>(() => new Grammar(""));
+            Assert.ThrowsException<ArgumentException>(() => new Grammar("hello"));
+            Assert.ThrowsException<ArgumentException>(() => new Grammar("hello}"));
+            Assert.ThrowsException<ArgumentException>(() => new Grammar("{hello}"));
+            Assert.ThrowsException<ArgumentException>(() => new Grammar("$hello}"));
         }
 
         [TestMethod()]
-        public void ParserTestEmpty()
+        public void GrammarTestEmpty()
         {
-            var parser = new Parser("${}");
+            var parser = new Grammar("${}");
             Assert.IsNotNull(parser);
             Assert.AreEqual(parser.Origin, "${}");
             Assert.AreEqual(parser.Property, "");
@@ -28,9 +29,9 @@ namespace TemplateGO.Tests
         }
 
         [TestMethod()]
-        public void ParserTestSimple()
+        public void GrammarTestSimple()
         {
-            var parser = new Parser("${hello}");
+            var parser = new Grammar("${hello}");
             Assert.IsNotNull(parser);
             Assert.AreEqual(parser.Origin, "${hello}");
             Assert.AreEqual(parser.Property, "hello");
@@ -39,9 +40,9 @@ namespace TemplateGO.Tests
         }
 
         [TestMethod()]
-        public void ParserTestHaveProcessor()
+        public void GrammarTestHaveProcessor()
         {
-            var parser = new Parser("${hello|test}");
+            var parser = new Grammar("${hello|test}");
             Assert.IsNotNull(parser);
             Assert.AreEqual(parser.Origin, "${hello|test}");
             Assert.AreEqual(parser.Property, "hello");
@@ -50,9 +51,9 @@ namespace TemplateGO.Tests
         }
 
         [TestMethod()]
-        public void ParserTestHaveProcessorAndOptions()
+        public void GrammarTestHaveProcessorAndOptions()
         {
-            var parser = new Parser("${hello|test:flag,user=yang,name=123}");
+            var parser = new Grammar("${hello|test:flag,user=yang,name=123}");
             Assert.IsNotNull(parser);
             Assert.AreEqual(parser.Origin, "${hello|test:flag,user=yang,name=123}");
             Assert.AreEqual(parser.Property, "hello");
@@ -66,9 +67,9 @@ namespace TemplateGO.Tests
         }
 
         [TestMethod()]
-        public void ParserTestHaveProcessorAndOptionsNoProp()
+        public void GrammarTestHaveProcessorAndOptionsNoProp()
         {
-            var parser = new Parser("${|test:flag,user=yang,name=123}");
+            var parser = new Grammar("${|test:flag,user=yang,name=123}");
             Assert.IsNotNull(parser);
             Assert.AreEqual(parser.Origin, "${|test:flag,user=yang,name=123}");
             Assert.AreEqual(parser.Property, "");

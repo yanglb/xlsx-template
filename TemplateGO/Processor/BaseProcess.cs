@@ -1,13 +1,14 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using TemplateGO.Parser;
 using TemplateGO.Utils;
 
 namespace TemplateGO.Processor
 {
     internal class BaseProcess
     {
-        protected void SetCellValue(Cell cell, string originValue, Parser parser, object? value, SharedStringTable? sharedStringTable)
+        protected void SetCellValue(Cell cell, string originValue, Grammar parser, object? value, SharedStringTable? sharedStringTable)
         {
             // 设置单元格内容
             if (originValue == parser.Origin)
