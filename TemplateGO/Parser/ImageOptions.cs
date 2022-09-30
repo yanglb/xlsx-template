@@ -4,6 +4,7 @@ namespace TemplateGO.Parser
 {
     public class ImageOptions
     {
+        public ImageOptions() { }
         public ImageOptions(Dictionary<string, string> options)
         {
             if (options.ContainsKey("padding"))

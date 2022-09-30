@@ -21,5 +21,15 @@ namespace TemplateGO.Parser.Tests
             Assert.AreEqual(fw, res.FrameWidth);
             Assert.AreEqual(fh, res.FrameHeight);
         }
+
+        [TestMethod()]
+        public void ImageOptionsTestEmpty()
+        {
+            var res = new ImageOptions();
+            Assert.IsNotNull(res);
+            Assert.AreEqual(0, res.Padding);
+            Assert.IsNull(res.FrameWidth);
+            Assert.IsNull(res.FrameHeight);
+        }
     }
 }
