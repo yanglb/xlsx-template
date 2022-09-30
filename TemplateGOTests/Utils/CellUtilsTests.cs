@@ -1,5 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Linq;
+using TemplateGOTests;
 
 namespace TemplateGO.Utils.Tests
 {
@@ -32,6 +36,44 @@ namespace TemplateGO.Utils.Tests
         {
             Assert.ThrowsException<ArgumentException>(() => CellUtils.RowValue(""));
             Assert.ThrowsException<ArgumentException>(() => CellUtils.ColumnValue(""));
+        }
+
+        [TestMethod()]
+        public void CellWidthTestNotSet()
+        {
+            using var doc = SpreadsheetDocument.Open(R.FullPath("data/cell-size.xlsx"), false);
+            Assert.IsNotNull(doc);
+
+            var sheet1 = doc.WorkbookPart?.Workbook.Descendants<Sheet>().Where(r => r.Name == "Sheet1").FirstOrDefault();
+            Assert.IsNotNull(sheet1);
+
+            var sheetPart = doc?.WorkbookPart?.GetPartById(sheet1.Id!) as WorksheetPart;
+            Assert.IsNotNull(sheetPart);
+
+            var cell = sheetPart.Worksheet.Descendants<Cell>().Where(r => r.CellReference == "A1").FirstOrDefault();
+            Assert.IsNotNull(cell);
+
+            //var res = CellUtils.CellWidth(cell, sheetPart);
+            //Assert.AreEqual(12, res);
+        }
+
+        [TestMethod()]
+        public void CellWidthTest()
+        {
+            using var doc = SpreadsheetDocument.Open(R.FullPath("data/cell-size.xlsx"), false);
+            Assert.IsNotNull(doc);
+
+            var sheet1 = doc.WorkbookPart?.Workbook.Descendants<Sheet>().Where(r => r.Name == "Sheet2").FirstOrDefault();
+            Assert.IsNotNull(sheet1);
+
+            var sheetPart = doc?.WorkbookPart?.GetPartById(sheet1.Id!) as WorksheetPart;
+            Assert.IsNotNull(sheetPart);
+
+            var cell = sheetPart.Worksheet.Descendants<Cell>().Where(r => r.CellReference == "A1").FirstOrDefault();
+            Assert.IsNotNull(cell);
+
+            //var res = CellUtils.CellWidth(cell, sheetPart);
+            //Assert.AreEqual(12, res);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.RegularExpressions;
 
 namespace TemplateGO.Utils
@@ -54,6 +55,26 @@ namespace TemplateGO.Utils
             //the result is zero based so return columnnumber + 1 for a 1 based answer
             //this will match Excel's COLUMN function
             return columnNumber + 1;
+        }
+
+        /// <summary>
+        /// 获取单元格宽度 Emu 单位
+        /// TODO: 后期处理
+        /// </summary>
+        public static long CellWidth(Cell cell, WorksheetPart worksheetPart)
+        {
+            var colValue = ColumnValue(cell.CellReference!);
+            var col = worksheetPart.Worksheet.Descendants<Column>()?.Where(
+                r => r.Min?.Value <= colValue && r.Max?.Value >= colValue
+                && r.CustomWidth?.Value == true
+                ).FirstOrDefault();
+
+            // 未设置列宽时返回默认值
+            if (col == null)
+            {
+                return 0;
+            }
+            return 1;
         }
     }
 }
