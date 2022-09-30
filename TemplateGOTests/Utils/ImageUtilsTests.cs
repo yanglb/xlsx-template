@@ -111,5 +111,22 @@ namespace TemplateGO.Utils.Tests
             var res = ImageUtils.GetImageShape(options, file);
             Assert.IsNotNull(res);
         }
+
+        [TestMethod()]
+        public void MoveToCenterTest()
+        {
+            var shape = new ImageShapeInfo() { W = 200, H = 200 };
+            var res = ImageUtils.MoveToCenter(shape, 400, 400);
+            Assert.AreEqual(100, res.X);
+            Assert.AreEqual(100, res.Y);
+
+            res = ImageUtils.MoveToCenter(shape, 200, 200);
+            Assert.AreEqual(0, res.X);
+            Assert.AreEqual(0, res.Y);
+
+            res = ImageUtils.MoveToCenter(shape, 100, 100);
+            Assert.AreEqual(0, res.X);
+            Assert.AreEqual(0, res.Y);
+        }
     }
 }

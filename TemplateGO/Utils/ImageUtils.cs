@@ -154,6 +154,21 @@ namespace TemplateGO.Utils
         }
 
         /// <summary>
+        /// 移动到中心点
+        /// </summary>
+        /// <param name="shape">形状</param>
+        /// <param name="fw">外框宽度</param>
+        /// <param name="fh">外框高度</param>
+        public static ImageShapeInfo MoveToCenter(ImageShapeInfo shape, long fw, long fh)
+        {
+            shape.X = (long)(fw / 2.0 - shape.W / 2.0);
+            shape.Y = (long)(fh / 2.0 - shape.H / 2.0);
+            if (shape.X < 0) shape.X = 0;
+            if (shape.Y < 0) shape.Y = 0;
+            return shape;
+        }
+
+        /// <summary>
         /// 将Base64编码的内容保存到文件中
         /// </summary>
         /// <param name="imageBase64Data">data:[mediatype][;base64],{base64-data}</param>
