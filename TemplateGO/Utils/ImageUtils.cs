@@ -1,8 +1,22 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
+using dotnetCampus.OpenXmlUnitConverter;
+using SixLabors.ImageSharp;
 using System.Text.RegularExpressions;
+using TemplateGO.Parser;
 
 namespace TemplateGO.Utils
 {
+    /// <summary>
+    /// 以 EMU 为单位
+    /// </summary>
+    public struct ImageShapeInfo
+    {
+        public long X;
+        public long Y;
+        public long W;
+        public long H;
+    }
+
     public static class ImageUtils
     {
         /// <summary>
@@ -57,6 +71,82 @@ namespace TemplateGO.Utils
                 default:
                     throw new NotSupportedException(extension + " is not supported");
             }
+        }
+
+        /// <summary>
+        /// 获取合适的图片位置及大小
+        /// </summary>
+        /// <param name="options">选项</param>
+        /// <param name="imageFile">图片文件</param>
+        public static ImageShapeInfo GetImageShape(ImageOptions options, string imageFile)
+        {
+            using var imgInfo = Image.Load(imageFile);
+            return GetImageShape(options, imgInfo.Width, imgInfo.Height);
+        }
+
+        /// <summary>
+        /// 获取合适的图片位置及大小
+        /// </summary>
+        /// <param name="options">选项</param>
+        /// <param name="width">图片宽度（px）</param>
+        /// <param name="height">图片高度（px）</param>
+        public static ImageShapeInfo GetImageShape(ImageOptions options, int width, int height)
+        {
+            var wEmu = (long)new Pixel(width).ToEmu().Value;
+            var hEmu = (long)new Pixel(height).ToEmu().Value;
+
+            var imageShape = new ImageShapeInfo();
+            imageShape.X = options.Padding;
+            imageShape.Y = options.Padding;
+            
+            // 未指定宽度及高度 使用图片大小
+            if (options.FrameWidth == null && options.FrameHeight == null)
+            {
+                imageShape.W = wEmu;
+                imageShape.H = hEmu;
+                return imageShape;
+            }
+
+            long? w = null, h = null;
+            if (options.FrameWidth != null && options.FrameHeight != null)
+            {
+                // 同时设置长宽时长边完全显示、短边缩放
+                var rateImg = width * 1.0 / height;
+                var rateFrm = options.FrameWidth!.Value * 1.0 / options.FrameHeight!.Value;
+
+                // 图片比外框要宽
+                if (rateImg > rateFrm) w = options.FrameWidth - (options.Padding * 2);
+                // 图片比外框高
+                else h = options.FrameHeight!.Value - (options.Padding * 2);
+            }
+            else if (options.FrameWidth != null)
+            {
+                w = options.FrameWidth - (options.Padding * 2);
+            }
+            else if (options.FrameHeight != null)
+            {
+                h = options.FrameHeight - (options.Padding * 2);
+            }
+
+            // 仅指定宽度
+            if (w != null)
+            {
+                imageShape.W = w.Value;
+                var rate = imageShape.W * 1.0 / width;
+                imageShape.H = (long)Math.Round(rate * height, MidpointRounding.AwayFromZero);
+                return imageShape;
+            }
+
+            // 仅指定高度时
+            if (h != null)
+            {
+                imageShape.H = h.Value;
+                var rate = imageShape.H * 1.0 / height;
+                imageShape.W = (long)Math.Round(rate * width, MidpointRounding.AwayFromZero);
+                return imageShape;
+            }
+
+            return imageShape;
         }
 
         /// <summary>
@@ -133,6 +223,5 @@ namespace TemplateGO.Utils
                     throw new ArgumentOutOfRangeException("imageType");
             }
         }
-
     }
 }
