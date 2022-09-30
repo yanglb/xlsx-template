@@ -22,12 +22,12 @@ namespace TemplateGO.Parser
             var prop = values.Split('|');
 
             // 属性key
-            Property = prop[0] ?? "";
+            Property = (prop[0] ?? "").Trim();
 
             // 处理器
             var proc = prop.Length > 1 ? prop[1]! : ProcessorType.Value;
             var opts = proc.Split(':');
-            Processor = opts[0]!;
+            Processor = opts[0]!.Trim();
 
             // 选项
             Options = new Dictionary<string, string>();
@@ -37,7 +37,7 @@ namespace TemplateGO.Parser
                 {
                     if (item == null) continue;
                     var kvs = item.Split('=');
-                    Options.Add(kvs[0], kvs.Length > 1 ? kvs[1] : "");
+                    Options.Add(kvs[0].Trim(), kvs.Length > 1 ? kvs[1].Trim() : "");
                 }
             }
         }
