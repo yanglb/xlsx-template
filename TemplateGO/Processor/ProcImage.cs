@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using TemplateGO.Parser;
 using TemplateGO.Utils;
 using A = DocumentFormat.OpenXml.Drawing;
 using Xdr = DocumentFormat.OpenXml.Drawing.Spreadsheet;
@@ -18,10 +19,12 @@ namespace TemplateGO.Processor
             // 设置单元格内容（空值）
             SetCellValue(p.Cell, p.OriginValue, p.Parser, null, p.SharedStringTable);
 
+            var options = new ImageOptions(p.Parser.Options);
+
             // 无数据时清空
             if (value != null && value.GetType() == typeof(string) && !string.IsNullOrEmpty(value as string))
             {
-                AddImage(p.Cell, p.WorksheetPart, $"{value}");
+                AddImage(p.Cell, p.WorksheetPart, $"{value}", options);
             }
             else
             {
@@ -31,7 +34,7 @@ namespace TemplateGO.Processor
 
         private void RemoveImage(Cell cell, WorksheetPart worksheetPart) { }
 
-        private void AddImage(Cell cell, WorksheetPart worksheetPart, string image)
+        private void AddImage(Cell cell, WorksheetPart worksheetPart, string image, ImageOptions options)
         {
             var drawingsPart = worksheetPart.DrawingsPart;
             if (drawingsPart == null) drawingsPart = worksheetPart.AddNewPart<DrawingsPart>();
@@ -46,17 +49,20 @@ namespace TemplateGO.Processor
             // 插入图片
             var imageFile = ImageUtils.ToLocalFile(image);
             var imagePart = drawingsPart.AddImagePart(ImageUtils.GetImagePartType(Path.GetExtension(imageFile)));
-            using var imageFs = new FileStream(imageFile, FileMode.Open);
-            imagePart.FeedData(imageFs!);
+            using (var imageFs = new FileStream(imageFile, FileMode.Open))
+            {
+                imagePart.FeedData(imageFs!);
+            }
 
-            A.Extents extents = new();
-            var extentsCx = 949569;
-            var extentsCy = 533400;
-
-            var colOffset = 0;
-            var rowOffset = 0;
+            // 位置与大小
             var rowNumber = CellUtils.RowValue(cell.CellReference!);
             var colNumber = CellUtils.ColumnValue(cell.CellReference!);
+            var shape = ImageUtils.GetImageShape(options, imageFile);
+            // 对齐方式暂时只能居中
+            if (options.FrameWidth != null && options.FrameHeight != null)
+            {
+                shape = ImageUtils.MoveToCenter(shape, options.FrameWidth.Value, options.FrameHeight.Value);
+            }
 
             var nvps = worksheetDrawing.Descendants<NonVisualDrawingProperties>();
             var nvpId = nvps.Count() > 0 ?
@@ -68,10 +74,10 @@ namespace TemplateGO.Processor
                 {
                     ColumnId = new ColumnId((colNumber - 1).ToString()),
                     RowId = new RowId((rowNumber - 1).ToString()),
-                    ColumnOffset = new ColumnOffset(colOffset.ToString()),
-                    RowOffset = new RowOffset(rowOffset.ToString())
+                    ColumnOffset = new ColumnOffset(shape.X.ToString()),
+                    RowOffset = new RowOffset(shape.Y.ToString())
                 },
-                new Extent { Cx = extentsCx, Cy = extentsCy },
+                new Extent { Cx = shape.W, Cy = shape.H },
                 new Xdr.Picture(
                     new NonVisualPictureProperties(
                         new NonVisualDrawingProperties { Id = nvpId, Name = "Picture " + nvpId },
@@ -83,8 +89,8 @@ namespace TemplateGO.Processor
                     ),
                     new ShapeProperties(
                         new A.Transform2D(
-                            new A.Offset { X = 0, Y = 0 },
-                            new A.Extents { Cx = extentsCx, Cy = extentsCy }
+                            new A.Offset { X = shape.X, Y = shape.Y },
+                            new A.Extents { Cx = shape.W, Cy = shape.H }
                         ),
                         new A.PresetGeometry { Preset = A.ShapeTypeValues.Rectangle }
                     )
