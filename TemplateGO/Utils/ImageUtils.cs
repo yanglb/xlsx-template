@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using dotnetCampus.OpenXmlUnitConverter;
+using QRCoder;
 using SixLabors.ImageSharp;
 using System.Text.RegularExpressions;
 using TemplateGO.Parser;
@@ -41,6 +42,24 @@ namespace TemplateGO.Utils
 
             // 其它当作文件处理
             return image;
+        }
+
+        /// <summary>
+        /// 生成二维码
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        public static string CreateQrCode(string content, int size = 20)
+        {
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(content, QRCodeGenerator.ECCLevel.Q);
+            PngByteQRCode qrCode = new(qrCodeData);
+            var data = qrCode.GetGraphic(size);
+
+            var filePath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".png");
+            using (var fs = File.OpenWrite(filePath)) fs.Write(data);
+            return filePath;
         }
 
         // 代码来自 ImagePartTypeInfo

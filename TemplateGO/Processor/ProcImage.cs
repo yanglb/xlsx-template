@@ -24,17 +24,17 @@ namespace TemplateGO.Processor
             // 无数据时清空
             if (value != null && value.GetType() == typeof(string) && !string.IsNullOrEmpty(value as string))
             {
-                AddImage(p.Cell, p.WorksheetPart, $"{value}", options);
-            }
-            else
-            {
-                RemoveImage(p.Cell, p.WorksheetPart);
+                var imageFile = GetImageLocalFile($"{value}", options);
+                AddImage(p.Cell, p.WorksheetPart, imageFile, options);
             }
         }
 
-        private void RemoveImage(Cell cell, WorksheetPart worksheetPart) { }
+        protected string GetImageLocalFile(string image, ImageOptions options)
+        {
+            return ImageUtils.ToLocalFile(image);
+        }
 
-        private void AddImage(Cell cell, WorksheetPart worksheetPart, string image, ImageOptions options)
+        private void AddImage(Cell cell, WorksheetPart worksheetPart, string imageFile, ImageOptions options)
         {
             var drawingsPart = worksheetPart.DrawingsPart;
             if (drawingsPart == null) drawingsPart = worksheetPart.AddNewPart<DrawingsPart>();
@@ -47,7 +47,6 @@ namespace TemplateGO.Processor
             var worksheetDrawing = drawingsPart.WorksheetDrawing!;
 
             // 插入图片
-            var imageFile = ImageUtils.ToLocalFile(image);
             var imagePart = drawingsPart.AddImagePart(ImageUtils.GetImagePartType(Path.GetExtension(imageFile)));
             using (var imageFs = new FileStream(imageFile, FileMode.Open))
             {

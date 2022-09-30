@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using TemplateGO.Utils;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Text;
@@ -127,6 +128,16 @@ namespace TemplateGO.Utils.Tests
             res = ImageUtils.MoveToCenter(shape, 100, 100);
             Assert.AreEqual(0, res.X);
             Assert.AreEqual(0, res.Y);
+        }
+
+        [DataRow("")]
+        [DataRow("这是一个测试文字")]
+        [DataRow("https://yanglb.com")]
+        [TestMethod()]
+        public void CreateQrCodeTest(string content)
+        {
+            var file = ImageUtils.CreateQrCode(content);
+            Assert.IsTrue(File.Exists(file));
         }
     }
 }
