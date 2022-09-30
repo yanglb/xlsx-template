@@ -98,7 +98,7 @@ namespace TemplateGO.Utils
             var imageShape = new ImageShapeInfo();
             imageShape.X = options.Padding;
             imageShape.Y = options.Padding;
-            
+
             // 未指定宽度及高度 使用图片大小
             if (options.FrameWidth == null && options.FrameHeight == null)
             {
@@ -121,26 +121,30 @@ namespace TemplateGO.Utils
             }
             else if (options.FrameWidth != null)
             {
+                // 仅指定宽度
                 w = options.FrameWidth - (options.Padding * 2);
             }
             else if (options.FrameHeight != null)
             {
+                // 仅指定高度
                 h = options.FrameHeight - (options.Padding * 2);
             }
 
-            // 仅指定宽度
+            // 以宽度为准
             if (w != null)
             {
                 imageShape.W = w.Value;
+                if (imageShape.W <= 0) throw new Exception("设置边距后图片宽度不足");
                 var rate = imageShape.W * 1.0 / width;
                 imageShape.H = (long)Math.Round(rate * height, MidpointRounding.AwayFromZero);
                 return imageShape;
             }
 
-            // 仅指定高度时
+            // 以高度为准
             if (h != null)
             {
                 imageShape.H = h.Value;
+                if (imageShape.H <= 0) throw new Exception("设置边距后图片高度不足");
                 var rate = imageShape.H * 1.0 / height;
                 imageShape.W = (long)Math.Round(rate * width, MidpointRounding.AwayFromZero);
                 return imageShape;
