@@ -18,7 +18,7 @@
         /// <summary>
         /// 图片
         /// </summary>
-        public const string Image = "img";
+        public const string Image = "image";
 
         /// <summary>
         /// 二维码
