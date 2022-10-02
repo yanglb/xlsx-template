@@ -128,5 +128,25 @@ namespace TemplateGO.Utils.Tests
             Assert.ThrowsException<ArgumentException>(() => CellUtils.IsRowIntersect(range1, range2));
             Assert.ThrowsException<ArgumentException>(() => CellUtils.IsColumnIntersect(range1, range2));
         }
+
+        [DataRow("A1:D10", 1, "A1:D11")]
+        [DataRow("A1:D10", 0, "A1:D10")]
+        [DataRow("A1:D10", -1, "A1:D9")]
+        [TestMethod()]
+        public void UpdateToReferenceTest(string origin, int shift, string expected)
+        {
+            var res = CellUtils.UpdateToReference(origin, shift);
+            Assert.AreEqual(expected, res);
+        }
+
+        [TestMethod()]
+        public void UpdateToReferenceTestBad()
+        {
+            Assert.ThrowsException<ArgumentException>(() => CellUtils.UpdateToReference("", 0));
+            Assert.ThrowsException<ArgumentException>(() => CellUtils.UpdateToReference("A2D10", 0));
+
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => CellUtils.UpdateToReference("A2:D10", -10));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => CellUtils.UpdateToReference("A2:D10", -11));
+        }
     }
 }

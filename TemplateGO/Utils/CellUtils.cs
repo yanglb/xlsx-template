@@ -158,5 +158,23 @@ namespace TemplateGO.Utils
             return ((aMin >= bMin && aMin <= bMax) || (aMax >= bMin && aMax <= bMax)) ||
                 ((bMin >= aMin && bMin <= aMax) || (bMax >= aMin && bMax <= aMax));
         }
+
+        /// <summary>
+        /// 更新引用区域大小（起始值不变）
+        /// </summary>
+        /// <param name="origin">原始引用区域</param>
+        /// <param name="shift">位移行数 + 表示增加 - 表示减少</param>
+        /// <returns></returns>
+        public static string UpdateToReference(string origin, int shift)
+        {
+            if (!Regex.IsMatch(origin, @"\w+\d+:\w+\d+")) throw new ArgumentException($"“{origin}”不是有效的区域");
+
+            var from = origin.Split(':')[0];
+            var to = origin.Split(':')[1];
+
+            var toValue = RowValue(to) + shift;
+            if (toValue <= 0) throw new ArgumentOutOfRangeException("超出有效范围");
+            return $"{from}:{ColumnReference(to)}{toValue}";
+        }
     }
 }
