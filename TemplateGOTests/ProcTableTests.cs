@@ -26,7 +26,7 @@ namespace TemplateGO.Tests
             Assert.IsNotNull(sheets);
         }
 
-        // 表格
+        // 大数据
         [TestMethod()]
         public void TableTestLarge()
         {

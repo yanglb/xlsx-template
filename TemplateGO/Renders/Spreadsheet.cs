@@ -89,12 +89,12 @@ namespace TemplateGO.Renders
 
             // 找出全部有效标识的单元格
             // ${key[|proc[:[settingKey1=settingValue1],[settingKey2=settingValue2]]}
-            var cells = wsPart.Worksheet.Descendants<Cell>().Where((Func<Cell, bool>)(cell =>
+            var cells = wsPart.Worksheet.Descendants<Cell>().Where(cell =>
             {
                 var value = CellUtils.GetCellString(cell, sharedStringTable);
                 if (string.IsNullOrEmpty(value)) return false;
                 return Regex.IsMatch(value, @"\${[^}]+}+");
-            }));
+            });
             Console.WriteLine($"Sheet {sheet.Name} 中共发现 {cells?.Count() ?? 0} 个单元格需要处理。");
             if (cells == null) return;
 
@@ -114,7 +114,6 @@ namespace TemplateGO.Renders
                     if (processor == null) continue;
 
                     // 处理
-                    // cell, cellValue, parser, sheet, data, sharedStringTable
                     processor.Process(new ProcessParams()
                     {
                         Cell = cell,
