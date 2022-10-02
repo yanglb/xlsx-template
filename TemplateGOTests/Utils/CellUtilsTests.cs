@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Packaging;
+﻿using TemplateGO.Utils;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -74,6 +75,58 @@ namespace TemplateGO.Utils.Tests
 
             //var res = CellUtils.CellWidth(cell, sheetPart);
             //Assert.AreEqual(12, res);
+        }
+
+        [DataRow("A1:C10", "B5:B6", true)]
+        [DataRow("A1:C10", "C10:C15", true)]
+        [DataRow("A1:C10", "C11:C15", false)]
+        [DataRow("A1:C10", "D10:D15", false)]
+        [DataRow("A1:C10", "D20:D25", false)]
+        [TestMethod()]
+        public void IsIntersectTest(string range1, string range2, bool expected)
+        {
+            var res1 = CellUtils.IsIntersect(range1, range2);
+            Assert.AreEqual(expected, res1);
+
+            var res2 = CellUtils.IsIntersect(range2, range1);
+            Assert.AreEqual(expected, res2);
+        }
+
+        [DataRow("2:4", "3:3", true)]
+        [DataRow("2:4", "1:5", true)]
+        [DataRow("2:4", "1:1", false)]
+        [TestMethod()]
+        public void IsRowIntersectTest(string range1, string range2, bool expected)
+        {
+            var res1 = CellUtils.IsRowIntersect(range1, range2);
+            Assert.AreEqual(expected, res1);
+
+            var res2 = CellUtils.IsRowIntersect(range2, range1);
+            Assert.AreEqual(expected, res2);
+        }
+
+        [DataRow("B:D", "B:B", true)]
+        [DataRow("B:D", "C:C", true)]
+        [DataRow("B:D", "A:E", true)]
+        [DataRow("B:D", "A:A", false)]
+        [TestMethod()]
+        public void IsColumnIntersectTest(string range1, string range2, bool expected)
+        {
+            var res1 = CellUtils.IsColumnIntersect(range1, range2);
+            Assert.AreEqual(expected, res1);
+
+            var res2 = CellUtils.IsColumnIntersect(range2, range1);
+            Assert.AreEqual(expected, res2);
+        }
+
+        [DataRow("", "")]
+        [DataRow("AF", "12")]
+        [TestMethod()]
+        public void IsIntersectTestBad(string range1, string range2)
+        {
+            Assert.ThrowsException<ArgumentException>(() => CellUtils.IsIntersect(range1, range2));
+            Assert.ThrowsException<ArgumentException>(() => CellUtils.IsRowIntersect(range1, range2));
+            Assert.ThrowsException<ArgumentException>(() => CellUtils.IsColumnIntersect(range1, range2));
         }
     }
 }

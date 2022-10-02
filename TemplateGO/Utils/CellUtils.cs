@@ -33,13 +33,22 @@ namespace TemplateGO.Utils
         }
 
         /// <summary>
+        /// 获取列引用 如 AB10 返回 AB
+        /// </summary>
+        /// <exception cref="ArgumentException"></exception>
+        public static string ColumnReference(string cellReference)
+        {
+            if (string.IsNullOrEmpty(cellReference)) throw new ArgumentException("cellReference 为空");
+            string columnReference = Regex.Replace(cellReference.ToUpper(), @"[\d]", string.Empty);
+            return columnReference;
+        }
+
+        /// <summary>
         /// 获取列值，从1开始 如 A10 返回1, B5 返回 2
         /// </summary>
         public static int ColumnValue(string cellReference)
         {
-            if (string.IsNullOrEmpty(cellReference)) throw new ArgumentException("cellReference 为空");
-            string columnReference = Regex.Replace(cellReference.ToUpper(), @"[\d]", string.Empty);
-
+            var columnReference = ColumnReference(cellReference);
             int columnNumber = -1;
             int mulitplier = 1;
 
@@ -75,6 +84,79 @@ namespace TemplateGO.Utils
                 return 0;
             }
             return 1;
+        }
+
+        /// <summary>
+        /// 判断两个区域是否相交
+        /// </summary>
+        /// <param name="range1">区域1 如: A1:C10</param>
+        /// <param name="range2">区域2 如: B3:J20</param>
+        /// <returns>是否相交</returns>
+        public static bool IsIntersect(string range1, string range2)
+        {
+            return IsRowIntersect(range1, range2) && IsColumnIntersect(range1, range2);
+        }
+
+        /// <summary>
+        /// 判断两个区域的行是否相交
+        /// </summary>
+        /// <param name="range1">区域1 如: A1:C10 或 1:10</param>
+        /// <param name="range2">区域2 如: B3:J20 或 3:20</param>
+        /// <returns>是否相交</returns>
+        public static bool IsRowIntersect(string range1, string range2)
+        {
+            if (!Regex.IsMatch(range1, @"\w*\d+:\w*\d+"))
+            {
+                throw new ArgumentException($"“{range1}”不是有效的区域");
+            }
+            if (!Regex.IsMatch(range2, @"\w*\d+:\w*\d+"))
+            {
+                throw new ArgumentException($"“{range2}”不是有效的区域");
+            }
+
+            // 行
+            var a = range1.Split(':');
+            var b = range2.Split(':');
+            var aMin = RowValue(a[0]);
+            var aMax = RowValue(a[1]);
+            var bMin = RowValue(b[0]);
+            var bMax = RowValue(b[1]);
+
+            return IsIntersect(aMin, aMax, bMin, bMax);
+        }
+
+        /// <summary>
+        /// 判断两个区域的列是否相交
+        /// </summary>
+        /// <param name="range1">区域1 如: A1:C10 或 A:C</param>
+        /// <param name="range2">区域2 如: B3:J20 或 A:C</param>
+        /// <returns>是否相交</returns>
+        public static bool IsColumnIntersect(string range1, string range2)
+        {
+            if (!Regex.IsMatch(range1, @"\w+\d*:\w+\d*"))
+            {
+                throw new ArgumentException($"“{range1}”不是有效的区域");
+            }
+            if (!Regex.IsMatch(range2, @"\w+\d*:\w+\d*"))
+            {
+                throw new ArgumentException($"“{range2}”不是有效的区域");
+            }
+
+            // 行
+            var a = range1.Split(':');
+            var b = range2.Split(':');
+            var aMin = ColumnValue(a[0]);
+            var aMax = ColumnValue(a[1]);
+            var bMin = ColumnValue(b[0]);
+            var bMax = ColumnValue(b[1]);
+
+            return IsIntersect(aMin, aMax, bMin, bMax);
+        }
+
+        private static bool IsIntersect(int aMin, int aMax, int bMin, int bMax)
+        {
+            return ((aMin >= bMin && aMin <= bMax) || (aMax >= bMin && aMax <= bMax)) ||
+                ((bMin >= aMin && bMin <= aMax) || (bMax >= aMin && bMax <= aMax));
         }
     }
 }
