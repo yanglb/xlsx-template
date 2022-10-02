@@ -26,6 +26,21 @@ namespace TemplateGO.Tests
             Assert.IsNotNull(sheets);
         }
 
+        // 表格
+        [TestMethod()]
+        public void TableTestLarge()
+        {
+            var outFile = "table-large-out.xlsx";
+            TemplateGO.Render(R.FullPath("data/table-large.xlsx"), R.JsonFromFile("data/table-large.json"), outFile);
+
+            // 应该能打开文档
+            using var doc = SpreadsheetDocument.Open(outFile, false);
+            Assert.IsNotNull(doc);
+            Assert.IsNotNull(doc.WorkbookPart);
+            var sheets = doc.WorkbookPart.Workbook.Descendants<Sheet>();
+            Assert.IsNotNull(sheets);
+        }
+
         // 简单填充
         [TestMethod()]
         public void TableTestSimple()
