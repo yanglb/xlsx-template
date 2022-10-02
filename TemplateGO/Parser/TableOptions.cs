@@ -7,22 +7,34 @@
         {
             if (options.ContainsKey("titleCount"))
             {
-                TitleCount = int.Parse(options["titleCount"]);
+                TitleCount = uint.Parse(options["titleCount"]);
             }
-            if(options.ContainsKey("keepExists"))
+            if(options.ContainsKey("sampleCount"))
             {
-                KeepExists = true;
+                SampleCount = uint.Parse(options["sampleCount"]);
+            }
+
+            if (options.ContainsKey("limit"))
+            {
+                Limit = int.Parse(options["limit"]);
             }
         }
 
         /// <summary>
         /// 标题行数目 key = titleCount, default = 1
         /// </summary>
-        public long TitleCount { get; private set; } = 1;
+        public uint TitleCount { get; private set; } = 1;
 
         /// <summary>
-        /// 是否清除原有数据 key = keepExists, default = false
+        /// 样本数据量 key = sampleCount, default = 0
+        /// 添加完数据后会删除样本数据行
         /// </summary>
-        public bool KeepExists { get; private set; } = false;
+        public uint SampleCount { get; private set; } = 0;
+
+        /// <summary>
+        /// 数量限制 key = limit
+        /// 为空时不限制
+        /// </summary>
+        public int? Limit { get; private set; } = null;
     }
 }
