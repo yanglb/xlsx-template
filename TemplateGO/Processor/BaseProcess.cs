@@ -53,6 +53,11 @@ namespace TemplateGO.Processor
                 cell.CellValue = new CellValue((int)value);
                 cell.DataType = CellValues.Number;
             }
+            else if (value.GetType() == typeof(uint))
+            {
+                cell.CellValue = new CellValue(Convert.ToInt32(value));
+                cell.DataType = CellValues.Number;
+            }
             else if (value.GetType() == typeof(double))
             {
                 cell.CellValue = new CellValue((double)value);
