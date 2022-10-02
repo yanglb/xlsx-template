@@ -21,6 +21,35 @@ namespace TemplateGO.Utils
             return DoGetValue(data, keys);
         }
 
+        /// <summary>
+        /// 获取JSON值
+        /// </summary>
+        public static object? GetValue(JsonElement value)
+        {
+            // 获取最终结果
+            switch (value.ValueKind)
+            {
+                case JsonValueKind.Number:
+                    // 有小数返回 Double 否则返回 int
+                    if (value.GetRawText().Contains('.')) return value.GetDouble();
+                    return value.GetInt32();
+
+                case JsonValueKind.True:
+                case JsonValueKind.False:
+                    return value.GetBoolean();
+
+                case JsonValueKind.String:
+                    return value.GetString()!;
+
+                case JsonValueKind.Null:
+                case JsonValueKind.Undefined:
+                    return null;
+            }
+
+            // Array/Object 直接返回
+            return value;
+        }
+
         static object? DoGetValue(JsonElement data, Queue<string> keys)
         {
             var key = keys.Dequeue();
@@ -52,27 +81,7 @@ namespace TemplateGO.Utils
             if (keys.Count > 0) return DoGetValue(value, keys);
 
             // 获取最终结果
-            switch (value.ValueKind)
-            {
-                case JsonValueKind.Number:
-                    // 有小数返回 Double 否则返回 int
-                    if (value.GetRawText().Contains('.')) return value.GetDouble();
-                    return value.GetInt32();
-
-                case JsonValueKind.True:
-                case JsonValueKind.False:
-                    return value.GetBoolean();
-
-                case JsonValueKind.String:
-                    return value.GetString()!;
-
-                case JsonValueKind.Null:
-                case JsonValueKind.Undefined:
-                    return null;
-            }
-
-            // Array/Object 直接返回
-            return value;
+            return GetValue(value);
         }
     }
 }
