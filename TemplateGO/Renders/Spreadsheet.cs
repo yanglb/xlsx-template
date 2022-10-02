@@ -52,6 +52,13 @@ namespace TemplateGO.Renders
                 ReplaceSheet(workbookPart, sheet, data, stringTable);
             }
 
+            // 如果处理过表格则删除计算链
+            if (ProcessorCache.ContainsKey(ProcessorType.Table))
+            {
+                var chailPart = workbookPart.CalculationChainPart;
+                if (chailPart != null) workbookPart.DeletePart(chailPart);
+            }
+
             // 保存工作表
             workbookPart.Workbook.Save();
             spreadsheetDocument.Save();
