@@ -22,14 +22,7 @@ namespace TemplateGO.Processor
             var config = GetTableConfig(p, options);
 
             // 填充数据
-            var count = FillData(value, p, config, options);
-
-            // 清理后续的内容
-            //if (!options.KeepExists)
-            //{
-            //    // TODO
-            //    CleanExists(01, count);
-            //}
+            FillData(value, p, config, options);
         }
 
         private JsonElement? GetListValue(ProcessParams p)
@@ -50,7 +43,7 @@ namespace TemplateGO.Processor
             return json;
         }
 
-        private TableConfig GetTableConfig(ProcessParams p, TableOptions options)
+        private static TableConfig GetTableConfig(ProcessParams p, TableOptions options)
         {
             var tableConfig = new TableConfig();
 
@@ -160,14 +153,10 @@ namespace TemplateGO.Processor
             public uint SampleCount { get; set; } = 0;
         }
 
-        private void CleanExists(uint from, uint to)
-        {
-            Console.WriteLine($"清理已有数据  from {from} to {to}");
-        }
 
-        private uint FillData(JsonElement? data, ProcessParams p, TableConfig config, TableOptions options)
+        private void FillData(JsonElement? data, ProcessParams p, TableConfig config, TableOptions options)
         {
-            uint count = 0;
+            // 空数据视为 []
             if (data == null) data = JsonDocument.Parse(@"[]")!.RootElement;
 
             uint idx = 0, rowIndex = 0;
@@ -176,13 +165,12 @@ namespace TemplateGO.Processor
             // 使用第1条样例数据的格式
             var refRow = p.WorksheetPart.Worksheet.Descendants<Row>().FirstOrDefault((r) => r.RowIndex?.Value == config.BeginRowIndex);
             var list = data.Value.EnumerateArray().ToList();
+
+            // 只处理选项中指定 Limit 条数
             if (options.Limit != null)
             {
                 list = list.Take(options.Limit.Value).ToList();
             }
-
-            // 最后一行
-            //Row? latestRow = null;
 
             // 插入的游标位置(从上往下找到离 BeginRowIndex 最近的一条)
             var latestRow = p.WorksheetPart.Worksheet.Descendants<Row>().LastOrDefault((r) => r.RowIndex?.Value < config.BeginRowIndex);
@@ -266,7 +254,7 @@ namespace TemplateGO.Processor
                 var sampleRows = afterLatestList.Take((int)config.SampleCount).ToList();
                 afterLatestList = afterLatestList.Skip(sampleRows.Count).ToList();
 
-                // TODO: 表格需要保留至少1行数据
+                // 表格需要保留至少1行数据
                 if (config.RefTable != null && idx <= 0)
                 {
                     var first = sampleRows[0];
@@ -325,10 +313,9 @@ namespace TemplateGO.Processor
                     }
                 }
             }
-            return count;
         }
 
-        private object? GetCellValue(JsonElement data, string propName, uint index, uint rowNumber)
+        private static object? GetCellValue(JsonElement data, string propName, uint index, uint rowNumber)
         {
             // 内容
             object? cellValue = null;
