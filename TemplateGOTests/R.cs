@@ -35,5 +35,15 @@ namespace TemplateGOTests
             var jsonString = File.ReadAllText(fullPath);
             return JsonDocument.Parse(jsonString)!.RootElement;
         }
+
+        /// <summary>
+        /// 获取输出文件地址
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        internal static string OutFullPath(string file)
+        {
+            return FullPath(Path.Combine("out", file));
+        }
     }
 }
