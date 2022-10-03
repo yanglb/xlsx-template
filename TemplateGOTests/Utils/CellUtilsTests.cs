@@ -148,5 +148,27 @@ namespace TemplateGO.Utils.Tests
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => CellUtils.UpdateToReference("A2:D10", -10));
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => CellUtils.UpdateToReference("A2:D10", -11));
         }
+
+        [DataRow("'te st'!$C$10:$F$20", 0, "'te st'!$C$10:$F$20")]
+        [DataRow("'te st'!$C$10:$F$20", 10, "'te st'!$C$10:$F$30")]
+        [DataRow("'te st'!$C$10:$F$20", -10, "'te st'!$C$10:$F$10")]
+        [DataRow("测试!C10:F20", 0, "测试!C10:F20")]
+        [DataRow("测试!C10:F20", 10, "测试!C10:F30")]
+        [DataRow("测试!C10:F20", -10, "测试!C10:F10")]
+        [TestMethod()]
+        public void ExpandRowReferenceTest(string input, int shift, string expected)
+        {
+            Assert.AreEqual(expected, CellUtils.ExpandRowReference(input, shift));
+        }
+
+        [DataRow("测试!C10F20", 10)]
+        [DataRow("测试!C10:F20T", 10)]
+        [DataRow("测试!C10:FT", 0)]
+        [DataRow("测试!C10:$10", 0)]
+        [TestMethod()]
+        public void ExpandRowReferenceTestBad(string input, int shift)
+        {
+            Assert.ThrowsException<ArgumentException>(() => CellUtils.ExpandRowReference(input, shift));
+        }
     }
 }
