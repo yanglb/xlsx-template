@@ -320,6 +320,10 @@ namespace TemplateGO.Processor
 
             // 更新图表引用
             CellUtils.UpdateChartReference(p.WorkbookPart, p.Sheet.Name!, shift, range);
+
+            // 更新迷你图
+            CellUtils.UpdateSparklineArea(p.WorksheetPart, shift, range);
+            CellUtils.UpdateSparklineReference(p.WorkbookPart, p.Sheet.Name!, shift, range);
         }
 
         private static object? GetCellValue(JsonElement data, string propName, uint index, uint rowNumber)

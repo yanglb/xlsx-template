@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.RegularExpressions;
@@ -209,13 +210,16 @@ namespace TemplateGO.Utils
 
         public static string ExpandRowReference(string reference, int rowShift)
         {
-            var idx = reference.LastIndexOf('$');
-            if (idx == -1) throw new ArgumentException($"{reference} 不是公式引用");
+            var idx = reference.LastIndexOf(':');
+            if (idx == -1) throw new ArgumentException($"{reference} 不是有效的公式引用");
 
-            var pre = reference[..(idx + 1)];
-            var row = reference[(idx + 1)..];
+            var pre = reference[..(idx + 1)]!;
+            var row = reference[(idx + 1)..]!;
 
-            return $"{pre}{int.Parse(row) + rowShift}";
+            var ends = Regex.Match(row, @"^(\$?[^\d\$]+\$?)(\d+)$");
+            if (!ends.Success) throw new ArgumentException($"{reference} 不是有效的公式引用");
+
+            return $"{pre}{ends.Groups[1].Value}{int.Parse(ends.Groups[2].Value) + rowShift}";
         }
 
         /// <summary>
@@ -226,7 +230,8 @@ namespace TemplateGO.Utils
         /// <param name="rowShift">增加/减少的行数</param>
         public static void UpdateChartReference(WorkbookPart workbookPart, string sheetName, int rowShift, string originArea)
         {
-            if (rowShift == 0) return;
+            // 偏移为0时也需要更新
+            //if (rowShift == 0) return;
             var chartList = GetAllCharts(workbookPart);
 
             foreach (var chart in chartList)
@@ -255,6 +260,77 @@ namespace TemplateGO.Utils
                 {
                     UpdateReference(f, rowShift);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 更新迷你图数据引用
+        /// 引用 originArea 的更新引用区域
+        /// </summary>
+        /// <param name="workbookPart"></param>
+        /// <param name="sheetName"></param>
+        /// <param name="shift"></param>
+        /// <param name="range"></param>
+        public static void UpdateSparklineReference(WorkbookPart workbookPart, string sheetName, int shift, string originArea)
+        {
+            // 所有引用 originArea 的迷你图
+            var refCharts = new List<Sparkline>();
+            foreach (var sheetPart in workbookPart.WorksheetParts)
+            {
+                var lines = sheetPart.Worksheet.Descendants<Sparkline>().Where((sLine) =>
+                {
+                    var formula = sLine.Formula?.InnerText;
+                    if (
+                        string.IsNullOrEmpty(formula) || // 不能为空
+                        !formula.Contains(sheetName) ||  // 必需引用该Sheet
+                        !formula.Contains(':')           // 必需是区域类型的
+                    )
+                    {
+                        return false;
+                    }
+
+                    // 位于 originArea 区域内
+                    var area = formula[(formula.IndexOf('!') + 1)..];
+                    return IsIntersect(area, originArea);
+
+                });
+                refCharts.AddRange(lines);
+            }
+
+            foreach (var chart in refCharts)
+            {
+                var newFormula = new DocumentFormat.OpenXml.Office.Excel.Formula(ExpandRowReference(chart.Formula!.InnerText!, shift));
+                chart.Formula = newFormula;
+            }
+        }
+
+        /// <summary>
+        /// 更新迷你图位置区域
+        /// 当前工作表中位于 originArea 后迷你图
+        /// </summary>
+        /// <param name="worksheetPart"></param>
+        /// <param name="shift"></param>
+        /// <param name="originArea"></param>
+        public static void UpdateSparklineArea(WorksheetPart worksheetPart, int shift, string originArea)
+        {
+            // 所有位于 originArea 以后的图表
+            var maxRow = RowValue(originArea.Split(':')[1]);
+
+            // 需要更新区域的图表
+            var spartLines = worksheetPart.Worksheet.Descendants<Sparkline>().Where((line) =>
+            {
+                var celRef = line.ReferenceSequence?.InnerText;
+                if (string.IsNullOrEmpty(celRef)) return false;
+                return RowValue(celRef) > maxRow;
+            });
+
+            foreach(var spartLine in spartLines)
+            {
+                var col = ColumnReference(spartLine.ReferenceSequence?.InnerText!);
+                var row = RowValue(spartLine.ReferenceSequence?.InnerText!);
+
+                var newRef = $"{col}{row+shift}";
+                spartLine.ReferenceSequence = new DocumentFormat.OpenXml.Office.Excel.ReferenceSequence(newRef);
             }
         }
 
