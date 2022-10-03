@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.Json;
 using TemplateGO.Parser;
 using TemplateGO.Utils;
@@ -157,7 +158,7 @@ namespace TemplateGO.Processor
         private void FillData(JsonElement? data, ProcessParams p, TableConfig config, TableOptions options)
         {
             // 空数据视为 []
-            if (data == null) data = JsonDocument.Parse(@"[]")!.RootElement;
+            data ??= JsonDocument.Parse(@"[]")!.RootElement;
 
             uint idx = 0, rowIndex = 0;
             var sheetData = p.WorksheetPart.Worksheet.GetFirstChild<SheetData>()!;
@@ -313,6 +314,12 @@ namespace TemplateGO.Processor
                     }
                 }
             }
+
+            // 之前的表格区域
+            var range = $"{config.KeyMap.Keys.First()}{config.BeginRowIndex}:{config.KeyMap.Keys.Last()}{config.BeginRowIndex+config.SampleCount}";
+
+            // 更新图表引用
+            CellUtils.UpdateChartReference(p.WorkbookPart, p.Sheet.Name!, shift, range);
         }
 
         private static object? GetCellValue(JsonElement data, string propName, uint index, uint rowNumber)
