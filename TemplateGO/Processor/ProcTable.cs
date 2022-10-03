@@ -324,6 +324,9 @@ namespace TemplateGO.Processor
             // 更新迷你图
             CellUtils.UpdateSparklineArea(p.WorksheetPart, shift, range);
             CellUtils.UpdateSparklineReference(p.WorkbookPart, p.Sheet.Name!, shift, range);
+
+            // 更新CellAnchor
+            CellUtils.MoveCellAnchor(p.WorksheetPart, shift, range);
         }
 
         private static object? GetCellValue(JsonElement data, string propName, uint index, uint rowNumber)

@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
@@ -324,13 +325,57 @@ namespace TemplateGO.Utils
                 return RowValue(celRef) > maxRow;
             });
 
-            foreach(var spartLine in spartLines)
+            foreach (var spartLine in spartLines)
             {
                 var col = ColumnReference(spartLine.ReferenceSequence?.InnerText!);
                 var row = RowValue(spartLine.ReferenceSequence?.InnerText!);
 
-                var newRef = $"{col}{row+shift}";
+                var newRef = $"{col}{row + shift}";
                 spartLine.ReferenceSequence = new DocumentFormat.OpenXml.Office.Excel.ReferenceSequence(newRef);
+            }
+        }
+
+        public static void MoveCellAnchor(WorksheetPart worksheetPart, int shift, string originArea)
+        {
+            // 所有位于 originArea 以后的描点
+            var minRow = RowValue(originArea.Split(':')[0]);
+            var maxRow = RowValue(originArea.Split(':')[1]);
+
+            // OneCellAnchor
+            var oneCells = worksheetPart?.DrawingsPart?.WorksheetDrawing.Descendants<OneCellAnchor>().ToList();
+            if (oneCells != null)
+            {
+                foreach (var anchor in oneCells)
+                {
+                    if (anchor.FromMarker?.RowId?.InnerText == null) break;
+                    var from = int.Parse(anchor.FromMarker?.RowId?.InnerText!);
+                    if (from + 1 <= maxRow) break;
+                    anchor.FromMarker!.RowId = new RowId((from + shift).ToString());
+                }
+            }
+
+            var twoCells = worksheetPart?.DrawingsPart?.WorksheetDrawing.Descendants<TwoCellAnchor>().ToList();
+            if(twoCells != null)
+            {
+                foreach (var anchor in twoCells)
+                {
+                    if (anchor.FromMarker?.RowId?.InnerText == null) break;
+                    if (anchor.ToMarker?.RowId?.InnerText == null) break;
+
+                    // 原始范围
+                    var from = int.Parse(anchor.FromMarker?.RowId?.InnerText!);
+                    var to = int.Parse(anchor.ToMarker?.RowId?.InnerText!);
+
+                    // 在表格上方的不处理
+                    // 横跨表格的也不处理（这种情况可能会导致显示出问题）
+
+                    // 仅处理位于表格下方的
+                    if (from + 1 >= maxRow)
+                    {
+                        anchor.FromMarker!.RowId = new RowId((from + shift).ToString());
+                        anchor.ToMarker!.RowId = new RowId((to + shift).ToString());
+                    }
+                }
             }
         }
 
