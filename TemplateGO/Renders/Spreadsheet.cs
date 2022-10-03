@@ -55,8 +55,8 @@ namespace TemplateGO.Renders
             // 如果处理过表格则删除计算链
             if (ProcessorCache.ContainsKey(ProcessorType.Table))
             {
-                var chailPart = workbookPart.CalculationChainPart;
-                if (chailPart != null) workbookPart.DeletePart(chailPart);
+                var chainPart = workbookPart.CalculationChainPart;
+                if (chainPart != null) workbookPart.DeletePart(chainPart);
             }
 
             // 保存工作表
