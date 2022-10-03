@@ -13,10 +13,11 @@ namespace TemplateGO.Tests
         [TestMethod()]
         public void ValueTest()
         {
-            TemplateGO.Render(R.FullPath("data/value.xlsx"), R.JsonFromFile("data/value.json"), "value-out.xlsx");
+            var outFile = R.OutFullPath("value-out.xlsx");
+            TemplateGO.Render(R.FullPath("data/value.xlsx"), R.JsonFromFile("data/value.json"), outFile);
 
             // 应该能打开文档
-            using (var doc = SpreadsheetDocument.Open("value-out.xlsx", false))
+            using (var doc = SpreadsheetDocument.Open(outFile, false))
             {
                 Assert.IsNotNull(doc);
                 Assert.IsNotNull(doc.WorkbookPart);

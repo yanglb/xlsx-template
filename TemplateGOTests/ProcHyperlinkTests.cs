@@ -12,10 +12,11 @@ namespace TemplateGO.Tests
         [TestMethod()]
         public void HyperlinkTest()
         {
-            TemplateGO.Render(R.FullPath("data/hyperlink.xlsx"), R.JsonFromFile("data/hyperlink.json"), "hyperlink-out.xlsx");
+            var outFile = R.OutFullPath("hyperlink-out.xlsx");
+            TemplateGO.Render(R.FullPath("data/hyperlink.xlsx"), R.JsonFromFile("data/hyperlink.json"), outFile);
 
             // 应该能打开文档
-            using var doc = SpreadsheetDocument.Open("hyperlink-out.xlsx", false);
+            using var doc = SpreadsheetDocument.Open(outFile, false);
             Assert.IsNotNull(doc);
             Assert.IsNotNull(doc.WorkbookPart);
             var sheets = doc.WorkbookPart.Workbook.Descendants<Sheet>();

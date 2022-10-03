@@ -19,11 +19,12 @@ namespace TemplateGO.Tests
         [TestMethod()]
         public void QrTest()
         {
+            var outFile = R.OutFullPath("qr-out.xlsx");
             var json = JsonSerializer.Serialize(TestData);
-            TemplateGO.Render(R.FullPath("data/qr.xlsx"), json, "qr-out.xlsx");
+            TemplateGO.Render(R.FullPath("data/qr.xlsx"), json, outFile);
 
             // 应该能打开文档
-            using var doc = SpreadsheetDocument.Open("qr-out.xlsx", false);
+            using var doc = SpreadsheetDocument.Open(outFile, false);
             Assert.IsNotNull(doc);
             Assert.IsNotNull(doc.WorkbookPart);
             var sheets = doc.WorkbookPart.Workbook.Descendants<Sheet>();

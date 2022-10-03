@@ -15,8 +15,37 @@ namespace TemplateGO.Tests
         [TestMethod()]
         public void TableTest()
         {
-            var outFile = "table-out.xlsx";
+            var outFile = R.OutFullPath("table-out.xlsx");
             TemplateGO.Render(R.FullPath("data/table.xlsx"), R.JsonFromFile("data/table.json"), outFile);
+
+            // 应该能打开文档
+            using var doc = SpreadsheetDocument.Open(outFile, false);
+            Assert.IsNotNull(doc);
+            Assert.IsNotNull(doc.WorkbookPart);
+            var sheets = doc.WorkbookPart.Workbook.Descendants<Sheet>();
+            Assert.IsNotNull(sheets);
+        }
+
+        // 空数据
+        [TestMethod()]
+        public void TableTestEmpty()
+        {
+            var outFile = R.OutFullPath("table-empty-out.xlsx");
+            TemplateGO.Render(R.FullPath("data/table.xlsx"), R.JsonFromFile("data/table-empty.json"), outFile);
+
+            // 应该能打开文档
+            using var doc = SpreadsheetDocument.Open(outFile, false);
+            Assert.IsNotNull(doc);
+            Assert.IsNotNull(doc.WorkbookPart);
+            var sheets = doc.WorkbookPart.Workbook.Descendants<Sheet>();
+            Assert.IsNotNull(sheets);
+        }
+        // 表格
+        [TestMethod()]
+        public void TableTestSimpleEmpty()
+        {
+            var outFile = R.OutFullPath("table-simple-empty-out.xlsx");
+            TemplateGO.Render(R.FullPath("data/table-simple.xlsx"), R.JsonFromFile("data/table-empty.json"), outFile);
 
             // 应该能打开文档
             using var doc = SpreadsheetDocument.Open(outFile, false);
@@ -30,7 +59,7 @@ namespace TemplateGO.Tests
         [TestMethod()]
         public void TableTestLarge()
         {
-            var outFile = "table-large-out.xlsx";
+            var outFile = R.OutFullPath("table-large-out.xlsx");
             TemplateGO.Render(R.FullPath("data/table-large.xlsx"), R.JsonFromFile("data/table-large.json"), outFile);
 
             // 应该能打开文档
@@ -45,7 +74,7 @@ namespace TemplateGO.Tests
         [TestMethod()]
         public void TableTestSimple()
         {
-            var outFile = "table-simple-out.xlsx";
+            var outFile = R.OutFullPath("table-simple-out.xlsx");
             TemplateGO.Render(R.FullPath("data/table-simple.xlsx"), R.JsonFromFile("data/table.json"), outFile);
 
             // 应该能打开文档
@@ -60,7 +89,7 @@ namespace TemplateGO.Tests
         [TestMethod()]
         public void TableTestRawData()
         {
-            var outFile = "table-raw-out.xlsx";
+            var outFile = R.OutFullPath("table-raw-out.xlsx");
             TemplateGO.Render(R.FullPath("data/table-raw.xlsx"), R.JsonFromFile("data/table-raw.json"), outFile);
 
             // 应该能打开文档

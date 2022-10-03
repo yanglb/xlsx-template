@@ -19,11 +19,12 @@ namespace TemplateGO.Tests
         [TestMethod()]
         public void ImageTest()
         {
+            var outFile = R.OutFullPath("image-out.xlsx");
             var json = JsonSerializer.Serialize(TestData);
-            TemplateGO.Render(R.FullPath("data/image.xlsx"), json, "image-out.xlsx");
+            TemplateGO.Render(R.FullPath("data/image.xlsx"), json, outFile);
 
             // 应该能打开文档
-            using var doc = SpreadsheetDocument.Open("image-out.xlsx", false);
+            using var doc = SpreadsheetDocument.Open(outFile, false);
             Assert.IsNotNull(doc);
             Assert.IsNotNull(doc.WorkbookPart);
             var sheets = doc.WorkbookPart.Workbook.Descendants<Sheet>();
