@@ -45,6 +45,11 @@ namespace TemplateGO
             render.Render(tempFile, data, trgExtension);
 
             // 直接移动到目标目录即可
+            var path = Path.GetDirectoryName(saveTo);
+            if(!string.IsNullOrEmpty(path) && !Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
             File.Move(tempFile, saveTo, true);
         }
     }
