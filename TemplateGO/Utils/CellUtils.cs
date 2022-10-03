@@ -1,6 +1,8 @@
-﻿using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.RegularExpressions;
+using Formula = DocumentFormat.OpenXml.Drawing.Charts.Formula;
 
 namespace TemplateGO.Utils
 {
@@ -175,6 +177,120 @@ namespace TemplateGO.Utils
             var toValue = RowValue(to) + shift;
             if (toValue <= 0) throw new ArgumentOutOfRangeException("超出有效范围");
             return $"{from}:{ColumnReference(to)}{toValue}";
+        }
+
+        public static List<Chart> GetAllCharts(WorkbookPart workbookPart)
+        {
+            var chartList = new List<Chart>();
+
+            // 图表Sheet
+            foreach (var chartSheetPart in workbookPart.ChartsheetParts)
+            {
+                var cs = chartSheetPart.DrawingsPart?.ChartParts;
+                if (cs == null) continue;
+                foreach (var cc in cs)
+                {
+                    chartList.AddRange(cc.ChartSpace.Descendants<Chart>());
+                }
+            }
+
+            // 普通Sheet中的图表
+            foreach (var sheetPart in workbookPart.WorksheetParts)
+            {
+                var cs = sheetPart.DrawingsPart?.ChartParts;
+                if (cs == null) continue;
+                foreach (var cc in cs)
+                {
+                    chartList.AddRange(cc.ChartSpace.Descendants<Chart>());
+                }
+            }
+            return chartList;
+        }
+
+        public static string ExpandRowReference(string reference, int rowShift)
+        {
+            var idx = reference.LastIndexOf('$');
+            if (idx == -1) throw new ArgumentException($"{reference} 不是公式引用");
+
+            var pre = reference[..(idx + 1)];
+            var row = reference[(idx + 1)..];
+
+            return $"{pre}{int.Parse(row) + rowShift}";
+        }
+
+        /// <summary>
+        /// 更新图表引用（仅处理引用表格区域图表的行数变化）
+        /// </summary>
+        /// <param name="workbookPart">工作表对象</param>
+        /// <param name="sheetName">数据变化的表格</param>
+        /// <param name="rowShift">增加/减少的行数</param>
+        public static void UpdateChartReference(WorkbookPart workbookPart, string sheetName, int rowShift, string originArea)
+        {
+            if (rowShift == 0) return;
+            var chartList = GetAllCharts(workbookPart);
+
+            foreach (var chart in chartList)
+            {
+                if (chart.PlotArea == null) continue;
+
+                // 所有引用 sheetName 的公式
+                var formulas = chart.Descendants<Formula>().Where((f) =>
+                {
+                    var formula = f.InnerText;
+                    if (
+                        string.IsNullOrEmpty(formula) || // 不能为空
+                        !formula.Contains(sheetName) ||  // 必需引用该Sheet
+                        !formula.Contains(':')           // 必需是区域类型的
+                    )
+                    {
+                        return false;
+                    }
+
+                    // 位于 originArea 区域内
+                    var area = formula[(formula.IndexOf('!') + 1)..];
+                    area = area.Replace("$", string.Empty);
+                    return IsIntersect(area, originArea);
+                });
+                foreach (var f in formulas)
+                {
+                    UpdateReference(f, rowShift);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 更新公式引用（仅处理行）
+        /// </summary>
+        /// <param name="formula">原先的公式</param>
+        /// <param name="rowShift">偏移行数</param>
+        private static void UpdateReference(Formula formula, int rowShift)
+        {
+            var parent = formula.Parent!;
+            var fText = formula.InnerText;
+
+            var newFormula = new Formula(ExpandRowReference(fText, rowShift));
+            if (parent is StringReference)
+            {
+                var reference = parent as StringReference;
+                if (reference != null)
+                {
+                    reference.Formula = newFormula;
+                    reference.StringCache = null;
+                }
+            }
+            else if (parent is NumberReference)
+            {
+                var reference = parent as NumberReference;
+                if (reference != null)
+                {
+                    reference.Formula = newFormula;
+                    reference.NumberingCache = null;
+                }
+            }
+            else if (parent is MultiLevelStringReference)
+            {
+                Console.WriteLine("暂不支持 MultiLevelStringReference 类型引用");
+            }
         }
     }
 }
