@@ -26,6 +26,21 @@ namespace TemplateGO.Tests
             Assert.IsNotNull(sheets);
         }
 
+        // 图表测试
+        [TestMethod()]
+        public void TableTestChart()
+        {
+            var outFile = R.OutFullPath("table-chart-out.xlsx");
+            TemplateGO.Render(R.FullPath("data/table-chart.xlsx"), R.JsonFromFile("data/table.json"), outFile);
+
+            // 应该能打开文档
+            using var doc = SpreadsheetDocument.Open(outFile, false);
+            Assert.IsNotNull(doc);
+            Assert.IsNotNull(doc.WorkbookPart);
+            var sheets = doc.WorkbookPart.Workbook.Descendants<Sheet>();
+            Assert.IsNotNull(sheets);
+        }
+
         // 空数据
         [TestMethod()]
         public void TableTestEmpty()

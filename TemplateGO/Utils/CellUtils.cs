@@ -338,7 +338,6 @@ namespace TemplateGO.Utils
         public static void MoveCellAnchor(WorksheetPart worksheetPart, int shift, string originArea)
         {
             // 所有位于 originArea 以后的描点
-            var minRow = RowValue(originArea.Split(':')[0]);
             var maxRow = RowValue(originArea.Split(':')[1]);
 
             // OneCellAnchor

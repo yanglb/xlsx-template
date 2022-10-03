@@ -59,6 +59,9 @@ namespace TemplateGO.Renders
                 if (chainPart != null) workbookPart.DeletePart(chainPart);
             }
 
+            // 处理 Text
+            ReplaceText(workbookPart, data);
+
             // 保存工作表
             workbookPart.Workbook.Save();
             spreadsheetDocument.Save();
@@ -77,6 +80,70 @@ namespace TemplateGO.Renders
             }
 
             return ProcessorCache[type];
+        }
+
+        /// <summary>
+        /// 替换除Cell外的数据
+        /// </summary>
+        private void ReplaceText(WorkbookPart workbookPart, JsonElement data)
+        {
+            var texts = AllFlagedText(workbookPart);
+            foreach (var text in texts)
+            {
+                var matchs = Regex.Matches(text.Text, @"\${([^}]+)+}");
+                if (matchs == null || matchs.Count == 0)
+                {
+                    throw new Exception($"无法处理标记: {text.Text}");
+                }
+
+                foreach (Match match in matchs.Cast<Match>())
+                {
+                    var parser = new Grammar(match.Value);
+                    if (parser.Processor != ProcessorType.Value)
+                    {
+                        Console.WriteLine($"暂不支持处理单元格外的 {parser.Processor}");
+                        continue;
+                    }
+
+                    var value = "";
+                    try
+                    {
+                        var v = data.GetProperty(parser.Property);
+                        if (value.GetType() == typeof(JsonElement)) value = "[object Object]";
+                        else value = $"{v}"; // 转为字符串
+                    }
+                    catch { }
+
+                    // 只替换第1个满足条件的
+                    var regex = new Regex(Regex.Escape(match.Value));
+                    var newValue = regex.Replace(text.Text, value, 1);
+                    text.Text = newValue;
+                }
+            }
+        }
+
+        private List<DocumentFormat.OpenXml.Drawing.Text> AllFlagedText(WorkbookPart workbookPart)
+        {
+            List<DocumentFormat.OpenXml.Drawing.Text> textList = new();
+
+            // 来自图表的
+            var charts = CellUtils.GetAllCharts(workbookPart);
+            foreach (var chart in charts)
+            {
+                var texts = chart.Descendants<DocumentFormat.OpenXml.Drawing.Text>().Where(r => Regex.IsMatch(r.Text, @"\${[^}]+}+"));
+                textList.AddRange(texts);
+            }
+
+            // 来自Sheet内
+            if (workbookPart.WorksheetParts != null)
+            {
+                foreach (var part in workbookPart.WorksheetParts)
+                {
+                    var texts = part.DrawingsPart?.WorksheetDrawing.Descendants<DocumentFormat.OpenXml.Drawing.Text>().Where(r => Regex.IsMatch(r.Text, @"\${[^}]+}+"));
+                    if (texts != null) textList.AddRange(texts);
+                }
+            }
+            return textList;
         }
 
         private void ReplaceSheet(WorkbookPart workbookPart, Sheet sheet, JsonElement data, SharedStringTable? sharedStringTable)
