@@ -1,6 +1,10 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using System;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
+using TemplateGO.Utils;
 
 namespace TemplateGOTests
 {
@@ -44,6 +48,22 @@ namespace TemplateGOTests
         internal static string OutFullPath(string file)
         {
             return FullPath(Path.Combine("out", file));
+        }
+
+        internal static string? CellStringValue(SpreadsheetDocument doc, string sheetName, string cellReference)
+        {
+            var sheet = doc.WorkbookPart?.Workbook.Descendants<Sheet>().FirstOrDefault((r) => r.Name == sheetName);
+            if (sheet == null) throw new ArgumentException($"工作表中不存在 {sheetName}。");
+
+            var sheetPart = doc.WorkbookPart?.GetPartById(sheet.Id!) as WorksheetPart;
+            if (sheetPart == null) throw new ArgumentException("不存在 WorksheetPart");
+
+            var shareStringTable = doc.WorkbookPart?.SharedStringTablePart?.SharedStringTable;
+
+            var cell = sheetPart.Worksheet.Descendants<Cell>().FirstOrDefault(r => r.CellReference == cellReference);
+            if (cell == null) throw new ArgumentException($"{sheetName} 中不存在 {cellReference}");
+
+            return CellUtils.GetCellString(cell, shareStringTable);
         }
     }
 }
