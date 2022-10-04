@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using TemplateGO.Parser;
 
 namespace TemplateGO.Processor
 {
@@ -10,8 +11,23 @@ namespace TemplateGO.Processor
             // 数据中指定的值
             object? value = GetValueByProperty(p.Data, p.Parser.Property);
 
+            // 超链接内容 如果用引号 "" 包裹则当作字符串否则尝试从data中获取
+            var options = new HyperlinkOptions(p.Parser.Options);
+            object? content = options.Content;
+            if(!string.IsNullOrEmpty(options.Content))
+            {
+                if (options.Content.StartsWith('"') && options.Content.EndsWith('"'))
+                {
+                    content = options.Content[1..^1];
+                }
+                else
+                {
+                    content = GetValueByProperty(p.Data, options.Content);
+                }
+            }
+
             // 设置单元格内容（空值）
-            SetCellValue(p.Cell, p.OriginValue, p.Parser, null, p.SharedStringTable);
+            SetCellValue(p.Cell, p.OriginValue, p.Parser, content, p.SharedStringTable);
 
             // 无链接地址时清空
             if (value != null && value.GetType() == typeof(string) && !string.IsNullOrEmpty(value as string))
