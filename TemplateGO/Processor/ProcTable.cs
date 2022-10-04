@@ -343,6 +343,9 @@ namespace TemplateGO.Processor
                 case "#seq":
                     cellValue = index + 1;
                     break;
+                case "#row":
+                    cellValue = rowNumber;
+                    break;
                 case "#value":
                     cellValue = JsonUtils.GetValue(data);
                     break;
