@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TemplateGO.Parser;
@@ -26,7 +27,7 @@ namespace TemplateGO.Renders
             { ".xlam", SpreadsheetDocumentType.AddIn },
         };
 
-        public void Render(string templatePath, JsonElement data, string? targetType)
+        public void Render(string templatePath, JsonElement data, string? targetType, TemplateOptions options)
         {
             using SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(templatePath, true);
 
@@ -49,7 +50,7 @@ namespace TemplateGO.Renders
             if (sheets == null) throw new ArgumentException("模板格式错误: Sheet 为空");
             foreach (var sheet in sheets)
             {
-                ReplaceSheet(workbookPart, sheet, data, stringTable);
+                ReplaceSheet(workbookPart, sheet, data, stringTable, options);
             }
 
             // 如果处理过表格则删除计算链
@@ -146,7 +147,7 @@ namespace TemplateGO.Renders
             return textList;
         }
 
-        private void ReplaceSheet(WorkbookPart workbookPart, Sheet sheet, JsonElement data, SharedStringTable? sharedStringTable)
+        private void ReplaceSheet(WorkbookPart workbookPart, Sheet sheet, JsonElement data, SharedStringTable? sharedStringTable, TemplateOptions options)
         {
             if (workbookPart.GetPartById(sheet.Id?.Value ?? "") is not WorksheetPart wsPart)
             {
@@ -190,7 +191,8 @@ namespace TemplateGO.Renders
                         Data = data,
                         SharedStringTable = sharedStringTable,
                         WorkbookPart = workbookPart,
-                        WorksheetPart = wsPart
+                        WorksheetPart = wsPart,
+                        Options = options,
                     });
                 }
             }

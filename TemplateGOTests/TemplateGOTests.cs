@@ -13,15 +13,17 @@ namespace TemplateGO.Tests
         [TestMethod()]
         public void GoTestXlsx()
         {
-            TemplateGO.Render(R.FullPath("data/go.xlsx"), R.JsonFromFile("data/go.json"), "go-out-xlsx.xlsx");
-            AssertFile("go-out-xlsx.xlsx");
+            var outFile = R.OutFullPath("go-out-xlsx.xlsx");
+            TemplateGO.Render(R.FullPath("data/go.xlsx"), R.JsonFromFile("data/go.json"), outFile);
+            AssertFile(outFile);
         }
 
         [TestMethod()]
         public void GoTestXltx()
         {
-            TemplateGO.Render(R.FullPath("data/go.xltx"), R.JsonFromFile("data/go.json"), "go-out-xltx.xlsx");
-            AssertFile("go-out-xltx.xlsx");
+            var outFile = R.OutFullPath("go-out-xltx.xlsx");
+            TemplateGO.Render(R.FullPath("data/go.xltx"), R.JsonFromFile("data/go.json"), outFile);
+            AssertFile(outFile);
         }
 
         private void AssertFile(string outFile)

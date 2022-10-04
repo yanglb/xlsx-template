@@ -12,8 +12,20 @@ namespace TemplateGO
         /// <param name="saveTo">输出文件</param>
         public static void Render(string templatePath, string jsonString, string saveTo)
         {
+            Render(templatePath, jsonString, saveTo, new TemplateOptions());
+        }
+
+        /// <summary>
+        /// 渲染模板
+        /// </summary>
+        /// <param name="templatePath">模板路径</param>
+        /// <param name="jsonString">JSON字符数据</param>
+        /// <param name="saveTo">输出文件</param>
+        /// <param name="options">选项</param>
+        public static void Render(string templatePath, string jsonString, string saveTo, TemplateOptions options)
+        {
             var jd = JsonDocument.Parse(jsonString)!.RootElement;
-            Render(templatePath, jd, saveTo);
+            Render(templatePath, jd, saveTo, options);
         }
 
         /// <summary>
@@ -23,6 +35,18 @@ namespace TemplateGO
         /// <param name="data">数据</param>
         /// <param name="saveTo">输出文件</param>
         public static void Render(string templatePath, JsonElement data, string saveTo)
+        {
+            Render(templatePath, data, saveTo, new TemplateOptions());
+        }
+
+        /// <summary>
+        /// 渲染模板
+        /// </summary>
+        /// <param name="templatePath">模板路径</param>
+        /// <param name="data">数据</param>
+        /// <param name="saveTo">输出文件</param>
+        /// <param name="options">选项</param>
+        public static void Render(string templatePath, JsonElement data, string saveTo, TemplateOptions options)
         {
             if (data.ValueKind != JsonValueKind.Object) throw new ArgumentException("仅支持根对象为Object类型的数据。");
 
@@ -42,7 +66,7 @@ namespace TemplateGO
             File.Copy(templatePath, tempFile);
 
             // 渲染
-            render.Render(tempFile, data, trgExtension);
+            render.Render(tempFile, data, trgExtension, options);
 
             // 直接移动到目标目录即可
             var path = Path.GetDirectoryName(saveTo);

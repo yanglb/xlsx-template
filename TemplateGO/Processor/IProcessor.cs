@@ -27,5 +27,7 @@ namespace TemplateGO.Processor
         public SharedStringTable? SharedStringTable { get; set; }
         public WorkbookPart WorkbookPart { get; set; }
         public WorksheetPart WorksheetPart { get; set; }
+
+        public TemplateOptions Options { get; set; }
     }
 }

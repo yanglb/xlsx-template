@@ -5,6 +5,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using TemplateGO.Parser;
 using TemplateGO.Utils;
 using A = DocumentFormat.OpenXml.Drawing;
+using Path = System.IO.Path;
 using Xdr = DocumentFormat.OpenXml.Drawing.Spreadsheet;
 
 namespace TemplateGO.Processor
@@ -21,36 +22,91 @@ namespace TemplateGO.Processor
 
             var options = new ImageOptions(p.Parser.Options);
 
-            // 无数据时清空
-            if (value != null && value.GetType() == typeof(string) && !string.IsNullOrEmpty(value as string))
+            // 处理图片内容
+            if (value != null && value.GetType() != typeof(string))
             {
-                var imageFile = GetImageLocalFile($"{value}", options);
-                AddImage(p.Cell, p.WorksheetPart, imageFile, options);
+                throw new ArgumentException($"图片属性只能为字符串或null {p.Parser.Property}");
             }
+
+            // 加载到本地的图片
+            var image = GetImageLocalFile(value as string, options, p);
+            if (string.IsNullOrEmpty(image)) return;
+
+            // 如果要求删除标记用的图片则先删除
+            if (options.DeleteMarked)
+            {
+                DeleteImage(p.Cell, p.WorksheetPart);
+            }
+
+            // 添加图片
+            AddImage(p.Cell, p.WorksheetPart, image, options);
         }
 
-        protected virtual string GetImageLocalFile(string image, ImageOptions options)
+        protected virtual string? GetImageLocalFile(string? image, ImageOptions options, ProcessParams p)
         {
-            return ImageUtils.ToLocalFile(image);
+            // 预处理图片
+            string? finalImage = image;
+            if (p.Options.PreLoadImage != null)
+            {
+                finalImage = p.Options.PreLoadImage(finalImage, p.Parser.Property, options);
+            }
+            if (string.IsNullOrEmpty(finalImage)) return finalImage;
+
+            return ImageUtils.ToLocalFile(finalImage);
+        }
+
+        private void DeleteImage(Cell cell, WorksheetPart worksheetPart)
+        {
+            var row = CellUtils.RowValue(cell.CellReference!) - 1;
+            var column = CellUtils.ColumnValue(cell.CellReference!) - 1;
+
+            // 删除 位于 cell 之上的所有图片
+            var pics = worksheetPart.DrawingsPart?.WorksheetDrawing.Descendants<Xdr.Picture>().Where((r) =>
+            {
+                var from = r.Parent?.GetFirstChild<Xdr.FromMarker>();
+                if (from == null) return false;
+                return from.RowId!.Text == row.ToString() && from.ColumnId!.Text == column.ToString();
+            }).ToList();
+            if (pics == null) return;
+
+            foreach (var pic in pics)
+            {
+                var blip = pic.Descendants<A.Blip>().FirstOrDefault();
+                if (blip != null && blip.Embed != null)
+                {
+                    var partId = blip.Embed.Value;
+                    if (!string.IsNullOrEmpty(partId))
+                    {
+                        // 图片可能公用，只有引用为1时删除（其它Sheet不受影响）
+                        var count = worksheetPart.DrawingsPart?.WorksheetDrawing.Descendants<A.Blip>().Count(r => r.Embed?.Value == partId);
+                        if (count <= 1)
+                        {
+                            worksheetPart.DrawingsPart?.DeletePart(partId);
+                        }
+                    }
+                }
+
+                // 删除图片
+                pic.Parent?.Remove();
+            }
         }
 
         private void AddImage(Cell cell, WorksheetPart worksheetPart, string imageFile, ImageOptions options)
         {
-            var drawingsPart = worksheetPart.DrawingsPart;
-            if (drawingsPart == null) drawingsPart = worksheetPart.AddNewPart<DrawingsPart>();
+            var drawingsPart = worksheetPart.DrawingsPart ?? worksheetPart.AddNewPart<DrawingsPart>();
             if (!worksheetPart.Worksheet.ChildElements.OfType<Drawing>().Any())
             {
                 worksheetPart.Worksheet.Append(new Drawing() { Id = worksheetPart.GetIdOfPart(drawingsPart) });
             }
 
-            if (drawingsPart.WorksheetDrawing == null) drawingsPart.WorksheetDrawing = new WorksheetDrawing();
+            drawingsPart.WorksheetDrawing ??= new WorksheetDrawing();
             var worksheetDrawing = drawingsPart.WorksheetDrawing!;
 
             // 插入图片
             var imagePart = drawingsPart.AddImagePart(ImageUtils.GetImagePartType(Path.GetExtension(imageFile)));
-            using (var imageFs = new FileStream(imageFile, FileMode.Open))
+            using (var fs = new FileStream(imageFile, FileMode.Open))
             {
-                imagePart.FeedData(imageFs!);
+                imagePart.FeedData(fs);
             }
 
             // 位置与大小
