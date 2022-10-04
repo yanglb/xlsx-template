@@ -96,6 +96,7 @@ namespace TemplateGO.Processor
         {
             if (value == null) value = "";
             if (value.GetType() == typeof(JsonElement)) value = "[object Object]";
+            if (value.GetType() == typeof(bool)) value = (bool)value ? "TRUE" : "FALSE";
 
             // 只替换第1个满足条件的
             var regex = new Regex(Regex.Escape(match));
