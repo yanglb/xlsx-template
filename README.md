@@ -150,6 +150,14 @@ ${ **property** [| **processor** [: **options** ]]}
 | ${file\|image:padding=0.5cm, fw=2cm, fh=2cm} | ![Avatar](https://avatars.githubusercontent.com/u/6257395?s=40&v=4) <br />_(用于演示)_ | 将 file 图片插入到标记所在单元格中，图片位于单元格左上角 0.5cm 处。<br />宽度或高度为2cm（长边=2cm 短边按比例缩放，并居中显示[^1]） |
 | ${base64\|image:deleteMarked} | ![Avatar](https://avatars.githubusercontent.com/u/6257395?s=40&v=4) <br />_(用于演示)_ | 将 base64 内容做为图片插入到标记所在位置，如果base64不为空则删除原先在该位置的图片。 |
 
+### qr 二维码
+#### 语法
+> ${property|qr[:padding=8px,fw=2.5cm,fh=2in,deleteMarked]}
+
+使用property所指内容生成二维码图片，然后使用与 **image** 相同的行为插入到文档中。
+
+选项、示例请参考 [image](#image-图片)
+
 [^1]: Microsoft Excel 中显示还有问题，LibreOffice正常。
 
 ## License
