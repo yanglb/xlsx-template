@@ -5,7 +5,7 @@
 |-------|---------------|-------|
 | Hello ${name} | {name: "Alice"} | Hello Alice |
 | ${home\|link:content} | {home: "https://yanglb.com", content: "Home Page"} | [Home Page](https://yanglb.com) |
-| ${avatar\|image:wf=2cm} | {avatar: "https://avatars.githubusercontent.com/u/6257395?s=40&v=4"} | ![Avatar](https://avatars.githubusercontent.com/u/6257395?s=40&v=4) |
+| ${avatar\|image:wf=2cm} | {avatar: "path-to-image"} | ![Avatar](https://avatars.githubusercontent.com/u/6257395?s=40&v=4) |
 > 更多内容请参考下文
 
 ## 开始
@@ -29,6 +29,9 @@ git clone git@github.com:yanglb/template-go.git
 cd template-go
 
 dotnet build && dotnet test
+
+# 测试结果:
+ls -lh TemplateGOTests/out 
 ```
 
 ## 文档
@@ -159,7 +162,63 @@ ${ **property** [| **processor** [: **options** ]]}
 
 选项、示例请参考 [image](#image-图片)
 
-[^1]: Microsoft Excel 中显示还有问题，LibreOffice正常。
+### table 表格
+仅支持在Excel中使用
+![Table Example](screenshots/table.png)
+
+#### 语法
+1. ${property|table[:options]} => 标记块
+2. columns => 列选项
+3. [title] => 标题行（可选）
+4. [sample] => 样例数据（可选）
+5. [other] => 其它内容（可选）
+
+#### options 选项
+| 名称 | 类型 | 默认值 | 说明
+| -- | -- | -- | -- |
+| **titleCount** | number | 1 | 标题行数量，默认为1。 |
+| **sampleCount** | number | 0 | 设计模板时添加的样本数据条数。当所在区域为表格时此选项无效。 |
+| **limit** | number | 不限制 | 限制最多插入数据条目数，默认为 property 所指数据的全部内容。 |
+
+#### columns列选项
+定义表格中每一列要插入的内容或属性名。
+
+| column值 | 示例 | 说明 |
+| --- | --- | --- |
+| #index | 0 | 此列插入数组索引值，从0开始。 |
+| #seq | 1 | 此列插入数组序列值，从1开始。 #seq = #index + 1 。|
+| #value | | 此列插入数组值，用于插入非Object/Array类型的列表数据。 |
+| =formulaProperty | =idFormual | 获取JSON数据中formulaProperty所指内容并作为公式插入到此列中。 |
+| =:formual | =:SUM(表1[[#This Row],[语文]:[英语]]) | 将 formual 作为公式插入到此列。 |
+| - | | 此列留空不插入任何内容。 |
+| _property_ | name | 通过 property 属性获取数组中当前对象的值，并插入此列。|
+
+#### title标题行
+【可选】 可为表格添加由 **titleCount** 中设置数量的标题行。
+
+#### sample样例数据
+【可选】 可为表格添加由 **sampleCount** 中设置数量的样例数据，方便设计模板。
+
+#### other其它内容
+【可选】 可为表格添加其它内容，如汇总行等[^2]。
+
+#### 示例
+```json
+{
+  "file": "path-to-image", 
+  "url": "https://avatars.githubusercontent.com/u/6257395?s=40&v=4",
+  "base64": "data:image/png;base64,xxxxx"
+}
+```
+| 标记块 | 输出 | 说明 |
+| ----  | ---- | ---- |
+| ${url\|image} | ![Avatar](https://avatars.githubusercontent.com/u/6257395?s=40&v=4) <br />_(用于演示)_ | 将 url 中的图片插入到标记所在位置，且保持原始大小。 |
+| ${file\|image:padding=0.5cm, fw=2cm, fh=2cm} | ![Avatar](https://avatars.githubusercontent.com/u/6257395?s=40&v=4) <br />_(用于演示)_ | 将 file 图片插入到标记所在单元格中，图片位于单元格左上角 0.5cm 处。<br />宽度或高度为2cm（长边=2cm 短边按比例缩放，并居中显示[^1]） |
+| ${base64\|image:deleteMarked} | ![Avatar](https://avatars.githubusercontent.com/u/6257395?s=40&v=4) <br />_(用于演示)_ | 将 base64 内容做为图片插入到标记所在位置，如果base64不为空则删除原先在该位置的图片。 |
+
+[^1]: Microsoft Excel中显示还有问题，LibreOffice正常。
+
+[^2]: 目前对公式支持不友好，如需要汇总等统计时请将区域转为表格并使用表格提供的相关公式处理。
 
 ## License
 Copyright (c) yanglb.com. All rights reserved.
