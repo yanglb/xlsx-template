@@ -5,21 +5,30 @@
 |-------|---------------|-------|
 | Hello ${name} | {name: "Alice"} | Hello Alice |
 | ${home\|link:content} | {home: "https://yanglb.com", content: "Home Page"} | [Home Page](https://yanglb.com) |
-| ${avatar\|image:wf=2cm} | {avatar: "https://avatars.githubusercontent.com/u/6257395?s=40&v=4"} | ![](https://avatars.githubusercontent.com/u/6257395?s=40&v=4) |
+| ${avatar\|image:wf=2cm} | {avatar: "https://avatars.githubusercontent.com/u/6257395?s=40&v=4"} | ![Avatar](https://avatars.githubusercontent.com/u/6257395?s=40&v=4) |
 > 更多内容请参考下文
 
-## 安装
+## 开始
+### 安装
 ```sh
 dotnet add package TemplateGO
 
 # 支持 Windows、Linux、MacOS
 ```
 
-## 使用
+### 使用
 ```c#
 var templateFile = "{template file path}";
 var jsonString = "{json data}";
 TemplateGO.Render(templateFile, jsonString, "out.xlsx");
+```
+
+### 测试
+```sh
+git clone git@github.com:yanglb/template-go.git
+cd template-go
+
+dotnet build && dotnet test
 ```
 
 ## 文档
@@ -102,6 +111,46 @@ ${ **property** [| **processor** [: **options** ]]}
 | ${url\|link:title} | [Home Page](https://yanglb.com) | 输出超链接 |
 | ${url\|link:"Test Page"} | [Test Page](https://yanglb.com) | 输出超链接 |
 | My Home Page${url\|link} | [My Home Page](https://yanglb.com) | **Excel 特有用法** Excel将超链接作用到单元格之上，因此整个单元格可点击。 |
+
+### image 图片
+#### 语法
+> ${property|image[:padding=8px,fw=2.5cm,fh=2in,deleteMarked]}
+
+**支持以下单位：**
+* cm 厘米
+* in 英寸
+* px 像素
+
+#### 选项
+| 名称 | 类型 | 可选 | 默认值 | 说明
+| -- | -- | -- | -- | -- |
+| **padding** | String | 是 | 0 | 指定图片内边距，偏离所在单元格起始位置。 |
+| **fw** | String | 是 | | 指定图片外框宽度。 |
+| **fh** | String | 是 | | 指定图片外框高度。 |
+| **deleteMarked** | Boolean | 是 | false | 指示是否在插入图片后删除位于同一单元格之上的图片。<br />JSON中指定的图片不存在时不会删除。<br />主要用于在设计模板时添加样例或默认图片，但希望在生成的文档中优先使用JSON中的图片的场景。 |
+
+**外框及边距说明**
+> fw/fh 并非控制图片尺寸，而是限制图片大小范围。
+
+* 仅设置 fw 时图片宽度调整为 fw 值，高度按比例缩放。
+* 仅设置 fh 时图片高度调整为 fh 值，宽度按比例缩放。
+* 同时设置 fw/fh 时长边对齐，短边按比例缩放后居中对齐显示[^1]
+
+#### 示例
+```json
+{
+  "file": "path-to-image", 
+  "url": "https://avatars.githubusercontent.com/u/6257395?s=40&v=4",
+  "base64": "data:image/png;base64,xxxxx"
+}
+```
+| 标记块 | 输出 | 说明 |
+| ----  | ---- | ---- |
+| ${url\|image} | ![Avatar](https://avatars.githubusercontent.com/u/6257395?s=40&v=4) <br />_(用于演示)_ | 将 url 中的图片插入到标记所在位置，且保持原始大小。 |
+| ${file\|image:padding=0.5cm, fw=2cm, fh=2cm} | ![Avatar](https://avatars.githubusercontent.com/u/6257395?s=40&v=4) <br />_(用于演示)_ | 将 file 图片插入到标记所在单元格中，图片位于单元格左上角 0.5cm 处。<br />宽度或高度为2cm（长边=2cm 短边按比例缩放，并居中显示[^1]） |
+| ${base64\|image:deleteMarked} | ![Avatar](https://avatars.githubusercontent.com/u/6257395?s=40&v=4) <br />_(用于演示)_ | 将 base64 内容做为图片插入到标记所在位置，如果base64不为空则删除原先在该位置的图片。 |
+
+[^1]: Microsoft Excel 中显示还有问题，LibreOffice正常。
 
 ## License
 Copyright (c) yanglb.com. All rights reserved.
