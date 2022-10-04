@@ -52,6 +52,7 @@ ${ **property** [| **processor** [: **options** ]]}
     "address": "北京市海淀区"
   }
 }
+
 // property:
 // name => Alice
 // score[0].score => 85
@@ -66,12 +67,12 @@ ${ **property** [| **processor** [: **options** ]]}
 | value (default) | 文字替换 | **默认** 使用property属性值替换标记块。<br /> **Excel:** 如果单元格仅包含该标记块，则根据JSON数据类型自动设置单元格数据类型。|
 | link | 超链接 | 将property所指内容视为链接地址，向文档添加超链接。 |
 | image | 图片 | 将property所指内容视为图片并插入到标记块所在位置。<br />支持本地文件、base64编码图片以及网络图片。 |
-| qr | 二维码 | 将property所指内容转为二维码并插入到标记块所在位置。|
+| qr | 二维码 | 通过property所指内容生成二维码并插入到标记块所在位置。|
 | table | 表格 | 向文档添加列表数据，property所指属性必需为数组。 |
 
 ### value 文字替换
 #### 语法
-> \${**property**} 或 ${property|value}
+> \${**property**} 或 ${**property**|value}
 
 其中value为默认处理单元，可省略。
 
@@ -82,7 +83,7 @@ ${ **property** [| **processor** [: **options** ]]}
 | 标记块 | 输出 | 说明 |
 | ----  | ---- | ---- |
 | ${name} | Alice | 单元格类型为 String |
-| ${age} | 18 | Number | 单元格类型为 Number |
+| ${age} | 18 | 单元格类型为 Number |
 | Age: ${age} | Age: 18 | 单元格类型为 String |
 | ${graduated} | FALSE | 单元格类型为 Boolean |
 | Is Graduated: ${graduated} | IS Graduated: FALSE | 单元格类型为 String |
@@ -98,9 +99,9 @@ ${ **property** [| **processor** [: **options** ]]}
 * content 作为链接显示内容，如 首页
 
 #### 选项
-| 名称 | 类型 | 可选 | 说明
+| 名称 | 类型 | 可选 | 默认值 | 说明
 | -- | -- | -- | -- |
-| **content** | String | 是 | 链接内容，如用英文引号("")包裹则视为字符串直接插入，否则将其当作属性key从JSON数据中获取。 |
+| **content** | String | 是 |  | 链接内容，如用英文引号("")包裹则视为字符串直接插入，否则将其当作属性key从JSON数据中获取。 |
 
 #### 示例
 ```json
