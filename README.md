@@ -133,6 +133,7 @@ ${ **property** [| **processor** [: **options** ]]}
 | **fw** | String | | 指定图片外框宽度。 |
 | **fh** | String | | 指定图片外框高度。 |
 | **deleteMarked** | Boolean | false | 指示是否在插入图片后删除位于同一单元格之上的图片。<br />JSON中指定的图片不存在时不会删除。<br />主要用于在设计模板时添加样例或默认图片，但希望在生成的文档中优先使用JSON中的图片的场景。 |
+
 **padding/fw/fh 支持以下单位：**
 * cm 厘米
 * in 英寸
