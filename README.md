@@ -187,11 +187,17 @@ ${ **property** [| **processor** [: **options** ]]}
 | --- | --- | --- |
 | #index | 0 | 此列插入数组索引值，从0开始。 |
 | #seq | 1 | 此列插入数组序列值，从1开始。 #seq = #index + 1 。|
-| #value | | 此列插入数组值，用于插入非Object/Array类型的列表数据。 |
-| =formulaProperty | =idFormual | 获取JSON数据中formulaProperty所指内容并作为公式插入到此列中。 |
-| =:formual | =:SUM(表1[[#This Row],[语文]:[英语]]) | 将 formual 作为公式插入到此列。 |
+| #row | 1 | 此例插入行号。 |
+| #value | "张三" | 此列插入数组值，用于插入非Object/Array类型的列表数据。 |
+| =formulaProperty | =sumScore | 获取JSON数据中formulaProperty所指内容并作为公式插入到此列中。 |
+| =:formual | =:SUM(表1[[#This Row],[语文]:[英语]]) | 将 formual 作为公式插入到此列中。 |
 | - | | 此列留空不插入任何内容。 |
 | _property_ | name | 通过 property 属性获取数组中当前对象的值，并插入此列。|
+
+> 指定 =:formual 时以下字符会替换为相应值
+> * #index
+> * #seq
+> * #row
 
 #### title标题行
 【可选】 可为表格添加由 **titleCount** 中设置数量的标题行。
