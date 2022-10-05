@@ -27,7 +27,7 @@ dotnet add package TemplateGO
 ```c#
 var templateFile = "{template file path}";
 var jsonString = "{json data}";
-TemplateGO.Render(templateFile, jsonString, "out.xlsx");
+TemplateRender.Render(templateFile, jsonString, "out.xlsx");
 ```
 
 ### 测试
