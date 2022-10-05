@@ -14,7 +14,7 @@ namespace TemplateGO.Tests
         public void ValueTest()
         {
             var outFile = R.OutFullPath("value-out.xlsx");
-            TemplateGO.Render(R.FullPath("data/value.xlsx"), R.JsonFromFile("data/value.json"), outFile);
+            TemplateRender.Render(R.FullPath("data/value.xlsx"), R.JsonFromFile("data/value.json"), outFile);
 
             // 应该能打开文档
             using (var doc = SpreadsheetDocument.Open(outFile, false))

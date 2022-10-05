@@ -21,7 +21,7 @@ namespace TemplateGO.Tests
         {
             var outFile = R.OutFullPath("qr-out.xlsx");
             var json = JsonSerializer.Serialize(TestData);
-            TemplateGO.Render(R.FullPath("data/qr.xlsx"), json, outFile);
+            TemplateRender.Render(R.FullPath("data/qr.xlsx"), json, outFile);
 
             // 应该能打开文档
             using var doc = SpreadsheetDocument.Open(outFile, false);

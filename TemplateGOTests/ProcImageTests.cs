@@ -29,7 +29,7 @@ namespace TemplateGO.Tests
         {
             var outFile = R.OutFullPath("image-out.xlsx");
             var json = JsonSerializer.Serialize(TestData);
-            TemplateGO.Render(R.FullPath("data/image.xlsx"), json, outFile, new TemplateOptions()
+            TemplateRender.Render(R.FullPath("data/image.xlsx"), json, outFile, new TemplateOptions()
             {
                 PreLoadImage = PreLoadImage
             });

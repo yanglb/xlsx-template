@@ -10,6 +10,10 @@ namespace TemplateGO
     /// <param name="options">模板中的选项</param>
     /// <returns>处理后的图片内容</returns>
     public delegate string? PreLoadImage(string? image, string property, ImageOptions options);
+
+    /// <summary>
+    /// 模板渲染选项
+    /// </summary>
     public struct TemplateOptions
     {
         /// <summary>

@@ -8,25 +8,25 @@ using TemplateGOTests;
 namespace TemplateGO.Tests
 {
     [TestClass()]
-    public class TemplateGOTests
+    public class TemplateRenderTests
     {
         [TestMethod()]
-        public void GoTestXlsx()
+        public void RenderTestXlsx()
         {
             var outFile = R.OutFullPath("go-out-xlsx.xlsx");
-            TemplateGO.Render(R.FullPath("data/go.xlsx"), R.JsonFromFile("data/go.json"), outFile);
+            TemplateRender.Render(R.FullPath("data/go.xlsx"), R.JsonFromFile("data/go.json"), outFile);
             AssertFile(outFile);
         }
 
         [TestMethod()]
-        public void GoTestXltx()
+        public void RenderTestXltx()
         {
             var outFile = R.OutFullPath("go-out-xltx.xlsx");
-            TemplateGO.Render(R.FullPath("data/go.xltx"), R.JsonFromFile("data/go.json"), outFile);
+            TemplateRender.Render(R.FullPath("data/go.xltx"), R.JsonFromFile("data/go.json"), outFile);
             AssertFile(outFile);
         }
 
-        private void AssertFile(string outFile)
+        private static void AssertFile(string outFile)
         {
             // 应该能打开文档
             using var doc = SpreadsheetDocument.Open(outFile, false);

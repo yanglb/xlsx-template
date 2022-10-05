@@ -16,7 +16,7 @@ namespace TemplateGO.Tests
         public void TableTest()
         {
             var outFile = R.OutFullPath("table-out.xlsx");
-            TemplateGO.Render(R.FullPath("data/table.xlsx"), R.JsonFromFile("data/table.json"), outFile);
+            TemplateRender.Render(R.FullPath("data/table.xlsx"), R.JsonFromFile("data/table.json"), outFile);
 
             // 应该能打开文档
             using var doc = SpreadsheetDocument.Open(outFile, false);
@@ -31,7 +31,7 @@ namespace TemplateGO.Tests
         public void TableTestChart()
         {
             var outFile = R.OutFullPath("table-chart-out.xlsx");
-            TemplateGO.Render(R.FullPath("data/table-chart.xlsx"), R.JsonFromFile("data/table.json"), outFile);
+            TemplateRender.Render(R.FullPath("data/table-chart.xlsx"), R.JsonFromFile("data/table.json"), outFile);
 
             // 应该能打开文档
             using var doc = SpreadsheetDocument.Open(outFile, false);
@@ -46,7 +46,7 @@ namespace TemplateGO.Tests
         public void TableTestEmpty()
         {
             var outFile = R.OutFullPath("table-empty-out.xlsx");
-            TemplateGO.Render(R.FullPath("data/table.xlsx"), R.JsonFromFile("data/table-empty.json"), outFile);
+            TemplateRender.Render(R.FullPath("data/table.xlsx"), R.JsonFromFile("data/table-empty.json"), outFile);
 
             // 应该能打开文档
             using var doc = SpreadsheetDocument.Open(outFile, false);
@@ -66,7 +66,7 @@ namespace TemplateGO.Tests
         public void TableTestSimpleEmpty()
         {
             var outFile = R.OutFullPath("table-simple-empty-out.xlsx");
-            TemplateGO.Render(R.FullPath("data/table-simple.xlsx"), R.JsonFromFile("data/table-empty.json"), outFile);
+            TemplateRender.Render(R.FullPath("data/table-simple.xlsx"), R.JsonFromFile("data/table-empty.json"), outFile);
 
             // 应该能打开文档
             using var doc = SpreadsheetDocument.Open(outFile, false);
@@ -88,7 +88,7 @@ namespace TemplateGO.Tests
         {
             var json = R.JsonFromFile("data/table-large.json");
             var outFile = R.OutFullPath("table-large-out.xlsx");
-            TemplateGO.Render(R.FullPath("data/table-large.xlsx"), json, outFile);
+            TemplateRender.Render(R.FullPath("data/table-large.xlsx"), json, outFile);
 
             // 应该能打开文档
             using var doc = SpreadsheetDocument.Open(outFile, false);
@@ -130,7 +130,7 @@ namespace TemplateGO.Tests
         public void TableTestSimple()
         {
             var outFile = R.OutFullPath("table-simple-out.xlsx");
-            TemplateGO.Render(R.FullPath("data/table-simple.xlsx"), R.JsonFromFile("data/table.json"), outFile);
+            TemplateRender.Render(R.FullPath("data/table-simple.xlsx"), R.JsonFromFile("data/table.json"), outFile);
 
             // 应该能打开文档
             using var doc = SpreadsheetDocument.Open(outFile, false);
@@ -151,7 +151,7 @@ namespace TemplateGO.Tests
         public void TableTestRawData()
         {
             var outFile = R.OutFullPath("table-raw-out.xlsx");
-            TemplateGO.Render(R.FullPath("data/table-raw.xlsx"), R.JsonFromFile("data/table-raw.json"), outFile);
+            TemplateRender.Render(R.FullPath("data/table-raw.xlsx"), R.JsonFromFile("data/table-raw.json"), outFile);
 
             // 应该能打开文档
             using var doc = SpreadsheetDocument.Open(outFile, false);

@@ -2,7 +2,7 @@
 
 namespace TemplateGO
 {
-    public static class TemplateGO
+    public static class TemplateRender
     {
         /// <summary>
         /// 渲染模板

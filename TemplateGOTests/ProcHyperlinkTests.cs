@@ -13,7 +13,7 @@ namespace TemplateGO.Tests
         public void HyperlinkTest()
         {
             var outFile = R.OutFullPath("hyperlink-out.xlsx");
-            TemplateGO.Render(R.FullPath("data/hyperlink.xlsx"), R.JsonFromFile("data/hyperlink.json"), outFile);
+            TemplateRender.Render(R.FullPath("data/hyperlink.xlsx"), R.JsonFromFile("data/hyperlink.json"), outFile);
 
             // 应该能打开文档
             using var doc = SpreadsheetDocument.Open(outFile, false);
