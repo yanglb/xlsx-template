@@ -7,7 +7,7 @@
 |-------|---------------|-------|
 | Hello ${name} | {name: "Alice"} | Hello Alice |
 | ${home\|link:content} | {home: "https://yanglb.com", content: "Home Page"} | [Home Page](https://yanglb.com) |
-| ${avatar\|image:wf=2cm} | {avatar: "screenshots/avatar.png"} | ![Avatar](https://raw.githubusercontent.com/yanglb/template-go/main/screenshots/avatar.png) |
+| ${avatar\|image:wf=2cm} | {avatar: "screenshots/avatar.jpg"} | ![Avatar](https://raw.githubusercontent.com/yanglb/template-go/main/screenshots/avatar.jpg) |
 > 更多内容请参考下文
 
 ## 限制
@@ -152,15 +152,15 @@ ${ **property** [| **processor** [: **options** ]]}
 ```json
 {
   "file": "path-to-image", 
-  "url": "https://raw.githubusercontent.com/yanglb/template-go/main/screenshots/avatar.png",
+  "url": "https://raw.githubusercontent.com/yanglb/template-go/main/screenshots/avatar.jpg",
   "base64": "data:image/png;base64,xxxxx"
 }
 ```
 | 标记块 | 输出 | 说明 |
 | ----  | ---- | ---- |
-| ${url\|image} | ![Avatar](https://raw.githubusercontent.com/yanglb/template-go/main/screenshots/avatar.png) <br />_(用于演示)_ | 将 url 中的图片插入到标记所在位置，且保持原始大小。 |
-| ${file\|image:padding=0.5cm, fw=2cm, fh=2cm} | ![Avatar](https://raw.githubusercontent.com/yanglb/template-go/main/screenshots/avatar.png) <br />_(用于演示)_ | 将 file 图片插入到标记所在单元格中，图片位于单元格左上角 0.5cm 处。<br />宽度或高度为2cm（长边=2cm 短边按比例缩放，并居中显示[^1]） |
-| ${base64\|image:deleteMarked} | ![Avatar](https://raw.githubusercontent.com/yanglb/template-go/main/screenshots/avatar.png) <br />_(用于演示)_ | 将 base64 内容做为图片插入到标记所在位置，如果base64不为空则删除原先在该位置的图片。 |
+| ${url\|image} | ![Avatar](https://raw.githubusercontent.com/yanglb/template-go/main/screenshots/avatar.jpg) <br />_(用于演示)_ | 将 url 中的图片插入到标记所在位置，且保持原始大小。 |
+| ${file\|image:padding=0.5cm, fw=2cm, fh=2cm} | ![Avatar](https://raw.githubusercontent.com/yanglb/template-go/main/screenshots/avatar.jpg) <br />_(用于演示)_ | 将 file 图片插入到标记所在单元格中，图片位于单元格左上角 0.5cm 处。<br />宽度或高度为2cm（长边=2cm 短边按比例缩放，并居中显示[^1]） |
+| ${base64\|image:deleteMarked} | ![Avatar](https://raw.githubusercontent.com/yanglb/template-go/main/screenshots/avatar.jpg) <br />_(用于演示)_ | 将 base64 内容做为图片插入到标记所在位置，如果base64不为空则删除原先在该位置的图片。 |
 
 ### qr 二维码
 #### 语法
@@ -247,7 +247,7 @@ ${ **property** [| **processor** [: **options** ]]}
 ![Table Result](https://raw.githubusercontent.com/yanglb/template-go/main/screenshots/table-out.png)
 
 
-[^1]: Microsoft Excel中显示还有问题，LibreOffice正常。
+[^1]: Microsoft_Excel中显示还有问题，LibreOffice正常。
 [^2]: 目前对公式支持不友好，如需要汇总等统计时请将区域转为表格并使用表格提供的相关公式处理。
 
 ## License
