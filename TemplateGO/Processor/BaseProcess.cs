@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TemplateGO.Parser;
+using TemplateGO.Transform;
 using TemplateGO.Utils;
 
 namespace TemplateGO.Processor
@@ -23,6 +24,24 @@ namespace TemplateGO.Processor
             }
         }
 
+        /// <summary>
+        /// 获取内容并执行转换方法
+        /// </summary>
+        /// <param name="data">JSON数据</param>
+        /// <param name="parser">标记语法解析结果</param>
+        /// <param name="options">选项</param>
+        protected object? GetValueAndTransform(JsonElement data, Grammar parser, TemplateOptions options)
+        {
+            object? value = GetValueByProperty(data, parser.Property);
+            value = ValueTransform.Transform(value, parser, options);
+            return value;
+        }
+
+        /// <summary>
+        /// 获取无需转换的内容
+        /// </summary>
+        /// <param name="data">JSON数据</param>
+        /// <param name="property">属性名</param>
         protected object? GetValueByProperty(JsonElement data, string? property)
         {
             try
