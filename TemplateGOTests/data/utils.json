@@ -12,6 +12,7 @@
       "age": 50
     }
   ],
+  "favorites": ["music", "move"],
   "phone": "18602507915",
   "height": 48.5,
   "weight": 3,

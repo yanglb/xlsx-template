@@ -41,6 +41,7 @@ namespace TemplateGO.Tests.Parser
         [DataRow("${prop|proc|t1|t2:k=v,k2=v2}S", "${prop|proc|t1|t2:k=v,k2=v2}")]
         [DataRow("T${prop|proc|t1|t2:k=v,k2=v2}S", "${prop|proc|t1|t2:k=v,k2=v2}")]
         [DataRow("Hello ${user}, this is your ${gitf|image}", "${user},${gitf|image}")]
+        [DataRow("Hello ${user[1].a1}, this is your ${gitf[2].s1|image|cm2m}", "${user[1].a1},${gitf[2].s1|image|cm2m}")]
         [TestMethod()]
         public void MatchesTest(string input, string? matchs)
         {
