@@ -18,6 +18,19 @@ namespace TemplateGO.Tests.Parser
             Assert.ThrowsException<ArgumentException>(() => new Grammar(value));
         }
 
+        [DataRow(null, false)]
+        [DataRow("", false)]
+        [DataRow("hello", false)]
+        [DataRow("${", false)]
+        [DataRow("${}", true)]
+        [DataRow("abc${}test", true)]
+        [DataRow("abc${ab|te:jj}test", true)]
+        [TestMethod()]
+        public void IsMatchTest(string ? input, bool expected)
+        {
+            Assert.AreEqual(expected, Grammar.IsMatch(input));
+        }
+
         [TestMethod()]
         public void GrammarTestEmpty()
         {

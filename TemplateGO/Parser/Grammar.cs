@@ -1,12 +1,28 @@
 ﻿using System.Linq;
+using System.Text.RegularExpressions;
 using TemplateGO.Processor;
 
 namespace TemplateGO.Parser
 {
+    /// <summary>
+    /// 语法块
+    /// <code>${key[|proc[|transform1|transform2][:[settingKey1=settingValue1],[settingKey2=settingValue2]]}</code>
+    /// </summary>
     public class Grammar
     {
         /// <summary>
-        /// 解析器语法 ${key[|proc[|transform1|transform2][:[settingKey1=settingValue1],[settingKey2=settingValue2]]}
+        /// 是否为语法标记块
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static bool IsMatch(string? input)
+        {
+            if (string.IsNullOrEmpty(input)) return false;
+            return Regex.IsMatch(input, @"\${[^}]*}+");
+        }
+
+        /// <summary>
+        /// 解析器语法
         /// </summary>
         public Grammar(string content)
         {
