@@ -117,7 +117,7 @@ TemplateRender.Render("template.xlsx", data, "out.xlsx", new TemplateOptions()
 
 ### value 文字替换
 #### 语法
-> \${**property**} 或 ${**property**|value}
+> \${**property** | [|transform]} 或 ${**property**|value[|transform]}
 
 其中value为默认处理单元，可省略。
 
@@ -139,7 +139,7 @@ TemplateRender.Render("template.xlsx", data, "out.xlsx", new TemplateOptions()
 
 ### link 超链接
 #### 语法
-> ${property|link[:options]}
+> ${property|link[|transform][:options]}
 
 #### 选项
 | 名称 | 类型 | 默认值 | 说明
@@ -160,7 +160,7 @@ TemplateRender.Render("template.xlsx", data, "out.xlsx", new TemplateOptions()
 
 ### image 图片
 #### 语法
-> ${property|image[:options]}
+> ${property|image[|transform][:options]}
 
 #### 选项
 | 名称 | 类型 | 默认值 | 说明
@@ -198,7 +198,7 @@ TemplateRender.Render("template.xlsx", data, "out.xlsx", new TemplateOptions()
 
 ### qr 二维码
 #### 语法
-> ${property|qr[:options]}
+> ${property|qr[|transform][:options]}
 
 使用property所指内容生成二维码图片，然后使用与 **image** 相同的行为插入到文档中。
 
@@ -211,7 +211,7 @@ TemplateRender.Render("template.xlsx", data, "out.xlsx", new TemplateOptions()
 
 #### 语法
 > 请在模板中按以下顺序设置: 
-1. **${property|table[:options]}** => 标记块
+1. **${property|table[|transform][:options]}** => 标记块
 2. **columns** => 列选项
 3. **[title]** => 标题行（可选）
 4. **[sample]** => 样例数据（可选）
