@@ -48,8 +48,6 @@ namespace TemplateGO
         /// <param name="options">选项</param>
         public static void Render(string templatePath, JsonElement data, string saveTo, TemplateOptions options)
         {
-            if (data.ValueKind != JsonValueKind.Object) throw new ArgumentException("仅支持根对象为Object类型的数据。");
-
             // 检查模板类型
             var srcExtension = Path.GetExtension(templatePath).ToLower();
             var trgExtension = Path.GetExtension(saveTo).ToLower();
