@@ -58,17 +58,19 @@ namespace TemplateGO.Utils
             JsonElement value;
             if (Regex.IsMatch(key, @"\[\d+\]$"))
             {
-                var match = Regex.Match(key, @"(\w+)\[(\d+)\]")!;
+                var match = Regex.Match(key, @"(\w+)?\[(\d+)\]")!;
                 if (!match.Success || match.Groups.Count != 3)
                 {
                     throw new ArgumentException($"key 格式不正确 {key}");
                 }
 
                 // 分别获取 key 及 数组索引
-                key = match.Groups[1]?.Value!;
+                key = match.Groups[1]?.Value;
                 var index = int.Parse(match.Groups[2]?.Value!);
 
-                value = data.GetProperty(key);
+                if (!string.IsNullOrEmpty(key)) value = data.GetProperty(key);
+                else value = data;
+
                 if (value.ValueKind != JsonValueKind.Array) throw new ArgumentException($"{key} 指定的对象不是数组。");
                 value = value.EnumerateArray().ElementAt(new Index(index));
             }
