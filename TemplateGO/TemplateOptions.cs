@@ -1,4 +1,5 @@
-﻿using TemplateGO.Parser;
+﻿using System.Text.Json;
+using TemplateGO.Parser;
 
 namespace TemplateGO
 {
@@ -12,6 +13,14 @@ namespace TemplateGO
     public delegate string? PreLoadImage(string? image, string property, ImageOptions options);
 
     /// <summary>
+    /// 数据转换
+    /// </summary>
+    /// <param name="value">输入值</param>
+    /// <param name="options">选项</param>
+    /// <returns>输出值</returns>
+    public delegate JsonElement? Transform(JsonElement? value, TransformOptions options);
+
+    /// <summary>
     /// 模板渲染选项
     /// </summary>
     public struct TemplateOptions
@@ -20,5 +29,10 @@ namespace TemplateGO
         /// 预加载图片
         /// </summary>
         public PreLoadImage ? PreLoadImage { get; set; }
+
+        /// <summary>
+        /// 转换器
+        /// </summary>
+        public Dictionary<string, Transform>? Transforms { get; set; }
     }
 }
