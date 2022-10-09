@@ -46,10 +46,8 @@ namespace TemplateGO.Processor
         {
             try
             {
-                if (!string.IsNullOrEmpty(property))
-                {
-                    return JsonUtils.GetValue(data, property);
-                }
+                // 否则获取内容
+                return JsonUtils.GetValue(data, property);
             }
             // 数据中不存在时视为 null
             catch (KeyNotFoundException) { }

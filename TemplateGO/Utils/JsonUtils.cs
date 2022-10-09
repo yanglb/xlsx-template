@@ -7,22 +7,30 @@ namespace TemplateGO.Utils
     {
         /// <summary>
         /// 根据属性在 JsonElement 中获取数据
+        /// paths 为空时返回 data
         /// 
+        /// <code>
         /// var data = { 'a': [{ 'b': { 'c': 3 } }, 4], 'd': 'hello' }
         /// GetValue(data, "a[0].b.c") // => 3
         /// GetValue(data, "d") // => "hello"
+        /// </code>
         /// </summary>
         /// <param name="data">JSON数据</param>
         /// <param name="paths">属性路径名</param>
         /// <returns></returns>
-        public static object? GetValue(JsonElement data, string paths)
+        public static object? GetValue(JsonElement data, string? paths)
         {
+            if(string.IsNullOrEmpty(paths)) return data;
+
             var keys = new Queue<string>(paths.Split('.'));
             return DoGetValue(data, keys);
         }
 
         /// <summary>
         /// 获取JSON值
+        /// 
+        /// ValueKind 为 Number 时有小数返回 double 否则返回 int32
+        /// Array/Object 直接返回JsonElement
         /// </summary>
         public static object? GetValue(JsonElement value)
         {

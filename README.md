@@ -48,6 +48,8 @@ ${ **property** [| **processor** [: **options** ]]}
 ### property 属性路径
 指示 TemplateGO 如何从JSON数据中获取要插入的内容。
 
+> property 为空字符串时直接返回 data 对象。
+
 如下所示:
 ```js
 // data:
