@@ -65,6 +65,12 @@ namespace TemplateGO.Tests
             Assert.AreEqual("李四|T", R.CellStringValue(doc, sheetName, "D11"));
         }
 
+        /// <summary>
+        /// 将 gender 转换为显示值
+        /// </summary>
+        /// <param name="value">male/female</param>
+        /// <param name="options">转换器选项</param>
+        /// <returns>性别友好值</returns>
         private object? GenderTransform(object? value, TransformOptions options)
         {
             if (value == null) return null;

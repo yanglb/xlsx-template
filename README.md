@@ -18,9 +18,8 @@
 ## 开始
 ### 安装
 ```sh
-dotnet add package TemplateGO
-
 # 支持 Windows、Linux、MacOS
+dotnet add package TemplateGO
 ```
 
 ### 使用
@@ -43,7 +42,7 @@ ls -lh TemplateGOTests/out
 
 ## 文档
 ### 模板语法
-${ **property** [| **processor** [: **options** ]]}
+${ **property** [| **processor** [| **transform**] [: **options** ]]}
 
 ### property 属性路径
 指示 TemplateGO 如何从JSON数据中获取要插入的内容。
@@ -72,6 +71,39 @@ ${ **property** [| **processor** [: **options** ]]}
 // notExists => undefined
 ```
 
+### transform 转换器
+
+在渲染前对数据进行处理。可添加多个转换器，多个转换器按标记块中出现的先后顺序执行。
+
+#### 示例
+```c#
+/// <summary>
+/// 将 gender 转换为显示值
+/// </summary>
+/// <param name="value">male/female</param>
+/// <param name="options">转换器选项</param>
+/// <returns>性别友好值</returns>
+private object? GenderTransform(object? value, TransformOptions options)
+{
+    if (value == null) return null;
+
+    if (value.ToString() == "male") return "男孩";
+    if (value.ToString() == "female") return "女孩";
+
+    return "未知";
+}
+
+// data = {"name": "Alice", "gender": "female" }
+TemplateRender.Render("template.xlsx", data, "out.xlsx", new TemplateOptions()
+{
+    Transforms = new Dictionary<string, TransformDelegate>() {
+        { "gender", GenderTransform },
+    }
+});
+
+// ${gender||gender} => 女孩
+// ${gender|value|gender} => 女孩
+```
 ### processor 处理单元
 指定数据处理单元，目前支持以下几种:
 
