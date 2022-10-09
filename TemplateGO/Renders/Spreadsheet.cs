@@ -1,10 +1,12 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TemplateGO.Parser;
 using TemplateGO.Processor;
+using TemplateGO.Transform;
 using TemplateGO.Utils;
 
 namespace TemplateGO.Renders
@@ -60,7 +62,7 @@ namespace TemplateGO.Renders
             }
 
             // 处理 Text
-            ReplaceText(workbookPart, data);
+            ReplaceText(workbookPart, data, options);
 
             // 保存工作表
             workbookPart.Workbook.Save();
@@ -85,7 +87,7 @@ namespace TemplateGO.Renders
         /// <summary>
         /// 替换除Cell外的数据
         /// </summary>
-        private void ReplaceText(WorkbookPart workbookPart, JsonElement data)
+        private void ReplaceText(WorkbookPart workbookPart, JsonElement data, TemplateOptions options)
         {
             var texts = AllFlagedText(workbookPart);
             foreach (var text in texts)
@@ -108,7 +110,8 @@ namespace TemplateGO.Renders
                     var value = "";
                     try
                     {
-                        var v = data.GetProperty(parser.Property);
+                        var v = JsonUtils.GetValue(data, parser.Property);
+                        v = ValueTransform.Transform(v, parser, options);
                         if (value.GetType() == typeof(JsonElement)) value = "[object Object]";
                         else value = $"{v}"; // 转为字符串
                     }
