@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Linq;
 using TemplateGO.Parser;
 
 namespace TemplateGO.Tests.Parser
@@ -26,9 +27,31 @@ namespace TemplateGO.Tests.Parser
         [DataRow("abc${}test", true)]
         [DataRow("abc${ab|te:jj}test", true)]
         [TestMethod()]
-        public void IsMatchTest(string ? input, bool expected)
+        public void IsMatchTest(string? input, bool expected)
         {
             Assert.AreEqual(expected, Grammar.IsMatch(input));
+        }
+
+        [DataRow("", null)]
+        [DataRow("${}", "${}")]
+        [DataRow("${prop|proc|t1|t2:k=v,k2=v2}", "${prop|proc|t1|t2:k=v,k2=v2}")]
+        [DataRow("T${prop|proc|t1|t2:k=v,k2=v2}", "${prop|proc|t1|t2:k=v,k2=v2}")]
+        [DataRow("${prop|proc|t1|t2:k=v,k2=v2}S", "${prop|proc|t1|t2:k=v,k2=v2}")]
+        [DataRow("T${prop|proc|t1|t2:k=v,k2=v2}S", "${prop|proc|t1|t2:k=v,k2=v2}")]
+        [DataRow("Hello ${user}, this is your ${gitf|image}", "${user},${gitf|image}")]
+        [TestMethod()]
+        public void MatchesTest(string input, string? matchs)
+        {
+            var res = Grammar.Matches(input);
+            Assert.IsNotNull(res);
+            if (matchs == null)
+            {
+                Assert.AreEqual(0, res.Count);
+            }
+            else
+            {
+                Assert.AreEqual(matchs, string.Join(',', res.Select(r => r.Value)));
+            }
         }
 
         [TestMethod()]

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using TemplateGO.Processor;
 
 namespace TemplateGO.Parser
@@ -13,12 +12,23 @@ namespace TemplateGO.Parser
         /// <summary>
         /// 是否为语法标记块
         /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        /// <param name="input">输入内容</param>
+        /// <returns>是否为标记块</returns>
         public static bool IsMatch(string? input)
         {
             if (string.IsNullOrEmpty(input)) return false;
             return Regex.IsMatch(input, @"\${[^}]*}+");
+        }
+
+        /// <summary>
+        /// 获取所有符合的标记块
+        /// </summary>
+        /// <param name="input">输入内容</param>
+        /// <returns>符合要求的标记块</returns>
+        public static MatchCollection Matches(string input)
+        {
+            var matchs = Regex.Matches(input, @"\${([^}]*)*}");
+            return matchs;
         }
 
         /// <summary>
