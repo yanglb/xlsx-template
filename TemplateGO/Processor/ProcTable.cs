@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.Json;
 using TemplateGO.Parser;
 using TemplateGO.Utils;
@@ -28,7 +27,7 @@ namespace TemplateGO.Processor
 
         private JsonElement? GetListValue(ProcessParams p)
         {
-            var value = GetValueByProperty(p.Data, p.Parser.Property);
+            var value = GetValueAndTransform(p.Data, p.Parser, p.Options);
             if (value == null) return null;
 
             if (value is not JsonElement)

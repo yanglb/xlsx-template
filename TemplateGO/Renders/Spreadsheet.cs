@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using TemplateGO.Parser;
 using TemplateGO.Processor;
+using TemplateGO.Transform;
 using TemplateGO.Utils;
 
 namespace TemplateGO.Renders
@@ -61,7 +62,7 @@ namespace TemplateGO.Renders
             }
 
             // 处理 Text
-            ReplaceText(workbookPart, data);
+            ReplaceText(workbookPart, data, options);
 
             // 保存工作表
             workbookPart.Workbook.Save();
@@ -86,18 +87,18 @@ namespace TemplateGO.Renders
         /// <summary>
         /// 替换除Cell外的数据
         /// </summary>
-        private void ReplaceText(WorkbookPart workbookPart, JsonElement data)
+        private void ReplaceText(WorkbookPart workbookPart, JsonElement data, TemplateOptions options)
         {
             var texts = AllFlagedText(workbookPart);
             foreach (var text in texts)
             {
-                var matchs = Regex.Matches(text.Text, @"\${([^}]+)+}");
+                var matchs = Grammar.Matches(text.Text);
                 if (matchs == null || matchs.Count == 0)
                 {
                     throw new Exception($"无法处理标记: {text.Text}");
                 }
 
-                foreach (Match match in matchs.Cast<Match>())
+                foreach (var match in matchs.Cast<Match>())
                 {
                     var parser = new Grammar(match.Value);
                     if (parser.Processor != ProcessorType.Value)
@@ -109,7 +110,8 @@ namespace TemplateGO.Renders
                     var value = "";
                     try
                     {
-                        var v = data.GetProperty(parser.Property);
+                        var v = JsonUtils.GetValue(data, parser.Property);
+                        v = ValueTransform.Transform(v, parser, options);
                         if (value.GetType() == typeof(JsonElement)) value = "[object Object]";
                         else value = $"{v}"; // 转为字符串
                     }
@@ -131,7 +133,7 @@ namespace TemplateGO.Renders
             var charts = CellUtils.GetAllCharts(workbookPart);
             foreach (var chart in charts)
             {
-                var texts = chart.Descendants<DocumentFormat.OpenXml.Drawing.Text>().Where(r => Regex.IsMatch(r.Text, @"\${[^}]+}+"));
+                var texts = chart.Descendants<DocumentFormat.OpenXml.Drawing.Text>().Where(r => Grammar.IsMatch(r.Text));
                 textList.AddRange(texts);
             }
 
@@ -140,7 +142,9 @@ namespace TemplateGO.Renders
             {
                 foreach (var part in workbookPart.WorksheetParts)
                 {
-                    var texts = part.DrawingsPart?.WorksheetDrawing.Descendants<DocumentFormat.OpenXml.Drawing.Text>().Where(r => Regex.IsMatch(r.Text, @"\${[^}]+}+"));
+                    var texts = part.DrawingsPart?.WorksheetDrawing
+                        .Descendants<DocumentFormat.OpenXml.Drawing.Text>()
+                        .Where(r => Grammar.IsMatch(r.Text));
                     if (texts != null) textList.AddRange(texts);
                 }
             }
@@ -156,12 +160,10 @@ namespace TemplateGO.Renders
             }
 
             // 找出全部有效标识的单元格
-            // ${key[|proc[:[settingKey1=settingValue1],[settingKey2=settingValue2]]}
             var cells = wsPart.Worksheet.Descendants<Cell>().Where(cell =>
             {
                 var value = CellUtils.GetCellString(cell, sharedStringTable);
-                if (string.IsNullOrEmpty(value)) return false;
-                return Regex.IsMatch(value, @"\${[^}]+}+");
+                return Grammar.IsMatch(value);
             });
             Console.WriteLine($"Sheet {sheet.Name} 中共发现 {cells?.Count() ?? 0} 个单元格需要处理。");
             if (cells == null) return;
@@ -169,13 +171,13 @@ namespace TemplateGO.Renders
             foreach (var cell in cells)
             {
                 var cellValue = CellUtils.GetCellString(cell, sharedStringTable);
-                var matchs = Regex.Matches(cellValue, @"\${([^}]+)+}");
-                if (matchs == null || matchs.Count == 0)
+                var matchs = Grammar.Matches(cellValue);
+                if (matchs == null)
                 {
                     throw new Exception($"无法处理单元格: {cell.CellReference} => {cellValue}");
                 }
 
-                foreach (Match match in matchs)
+                foreach (var match in matchs.Cast<Match>())
                 {
                     var parser = new Grammar(match.Value);
                     var processor = ProcessorByType(parser.Processor);

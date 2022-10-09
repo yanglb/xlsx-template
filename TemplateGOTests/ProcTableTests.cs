@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TemplateGO.Utils;
@@ -165,17 +166,58 @@ namespace TemplateGO.Tests
             var shareStringTable = doc.WorkbookPart.SharedStringTablePart?.SharedStringTable;
             Assert.IsNotNull(sheetPart);
 
-            var users = new List<string>()
-            {
-                "贾阳煦", "钟惠玲", "孟三春", "边念蕾", "终苏凌", "勾融雪", "甄映寒", "濮高寒", "范弘致", "公冰洁"
-            };
-            var cells = sheetPart.Worksheet.Descendants<Cell>().Where(r => r.CellReference!.Value!.StartsWith("D") && (r.Parent as Row)!.RowIndex!.Value >= 5);
-            Assert.AreEqual(users.Count, cells.Count());
-            foreach (var cell in cells)
-            {
-                var cellval = CellUtils.GetCellString(cell, shareStringTable);
-                Assert.IsTrue(users.IndexOf(cellval) >= 0);
-            }
+            var nameExpected = "贾阳煦,钟惠玲,孟三春,边念蕾,终苏凌,勾融雪,甄映寒,濮高寒,范弘致,公冰洁";
+            var names = string.Join(',', ColumnStrings(sheetPart.Worksheet, shareStringTable, "D", 5));
+            Assert.AreEqual(nameExpected, names);
+        }
+
+        /// <summary>
+        /// 二维数组
+        /// </summary>
+        [TestMethod()]
+        public void TableTestArrayData()
+        {
+            var outFile = R.OutFullPath("table-array-out.xlsx");
+            TemplateRender.Render(R.FullPath("data/table-array.xlsx"), R.JsonFromFile("data/table-array.json"), outFile);
+
+            // 应该能打开文档
+            using var doc = SpreadsheetDocument.Open(outFile, false);
+            Assert.IsNotNull(doc);
+            Assert.IsNotNull(doc.WorkbookPart);
+            var sheets = doc.WorkbookPart.Workbook.Descendants<Sheet>();
+            Assert.IsNotNull(sheets);
+
+            // 检查D列数据是否正常
+            var sheetPart = doc.WorkbookPart.GetPartById(sheets.FirstOrDefault()!.Id!) as WorksheetPart;
+            var shareStringTable = doc.WorkbookPart.SharedStringTablePart?.SharedStringTable;
+            Assert.IsNotNull(sheetPart);
+
+            var nameExpected = "贾阳煦,钟惠玲,孟三春,边念蕾,终苏凌,勾融雪,甄映寒,濮高寒,范弘致,公冰洁";
+            var languageExpected = "85,91,96,81,95,76,62,67,87,73";
+            var mathExpected = "71,61,81,67,72,99,69,90,79,86";
+            var englishExpected = "84,82,93,85,70,89,80,74,100,86";
+
+            var names = string.Join(',', ColumnStrings(sheetPart.Worksheet, shareStringTable, "D", 5));
+            Assert.AreEqual(nameExpected, names);
+
+            var languages = string.Join(',', ColumnStrings(sheetPart.Worksheet, shareStringTable, "E", 5));
+            Assert.AreEqual(languageExpected, languages);
+
+            var maths = string.Join(',', ColumnStrings(sheetPart.Worksheet, shareStringTable, "F", 5));
+            Assert.AreEqual(mathExpected, maths);
+
+            var englishs = string.Join(',', ColumnStrings(sheetPart.Worksheet, shareStringTable, "G", 5));
+            Assert.AreEqual(englishExpected, englishs);
+        }
+
+        private string[] ColumnStrings(Worksheet worksheet, SharedStringTable? sharedStringTable, string columnName, int startRow)
+        {
+            var res = worksheet.Descendants<Cell>()
+                .Where(r => r.CellReference!.Value!.StartsWith(columnName) && (r.Parent as Row)!.RowIndex!.Value >= startRow)
+                .Select(r => CellUtils.GetCellString(r, sharedStringTable))
+                .ToArray();
+
+            return res;
         }
     }
 }

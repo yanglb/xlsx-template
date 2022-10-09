@@ -7,22 +7,30 @@ namespace TemplateGO.Utils
     {
         /// <summary>
         /// 根据属性在 JsonElement 中获取数据
+        /// paths 为空时返回 data
         /// 
+        /// <code>
         /// var data = { 'a': [{ 'b': { 'c': 3 } }, 4], 'd': 'hello' }
         /// GetValue(data, "a[0].b.c") // => 3
         /// GetValue(data, "d") // => "hello"
+        /// </code>
         /// </summary>
         /// <param name="data">JSON数据</param>
         /// <param name="paths">属性路径名</param>
         /// <returns></returns>
-        public static object? GetValue(JsonElement data, string paths)
+        public static object? GetValue(JsonElement data, string? paths)
         {
+            if(string.IsNullOrEmpty(paths)) return data;
+
             var keys = new Queue<string>(paths.Split('.'));
             return DoGetValue(data, keys);
         }
 
         /// <summary>
         /// 获取JSON值
+        /// 
+        /// ValueKind 为 Number 时有小数返回 double 否则返回 int32
+        /// Array/Object 直接返回JsonElement
         /// </summary>
         public static object? GetValue(JsonElement value)
         {
@@ -58,17 +66,19 @@ namespace TemplateGO.Utils
             JsonElement value;
             if (Regex.IsMatch(key, @"\[\d+\]$"))
             {
-                var match = Regex.Match(key, @"(\w+)\[(\d+)\]")!;
+                var match = Regex.Match(key, @"(\w+)?\[(\d+)\]")!;
                 if (!match.Success || match.Groups.Count != 3)
                 {
                     throw new ArgumentException($"key 格式不正确 {key}");
                 }
 
                 // 分别获取 key 及 数组索引
-                key = match.Groups[1]?.Value!;
+                key = match.Groups[1]?.Value;
                 var index = int.Parse(match.Groups[2]?.Value!);
 
-                value = data.GetProperty(key);
+                if (!string.IsNullOrEmpty(key)) value = data.GetProperty(key);
+                else value = data;
+
                 if (value.ValueKind != JsonValueKind.Array) throw new ArgumentException($"{key} 指定的对象不是数组。");
                 value = value.EnumerateArray().ElementAt(new Index(index));
             }

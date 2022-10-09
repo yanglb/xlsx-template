@@ -1,0 +1,16 @@
+﻿[
+  {
+    "name": "张三",
+    "gender": "male",
+    "age": 16,
+    "height": 160,
+    "score": 85.5
+  },
+  {
+    "name": "李四",
+    "gender": "female",
+    "age": 15,
+    "height": 175,
+    "score": 70
+  }
+]

@@ -9,7 +9,7 @@ namespace TemplateGO.Processor
         void IProcessor.Process(ProcessParams p)
         {
             // 数据中指定的值
-            object? value = GetValueByProperty(p.Data, p.Parser.Property);
+            object? value = GetValueAndTransform(p.Data, p.Parser, p.Options);
 
             // 超链接内容 如果用引号 "" 包裹则当作字符串否则尝试从data中获取
             var options = new HyperlinkOptions(p.Parser.Options);

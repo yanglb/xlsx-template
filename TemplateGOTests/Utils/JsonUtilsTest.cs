@@ -7,7 +7,7 @@ using TemplateGOTests;
 namespace TemplateGO.Tests
 {
     [TestClass()]
-    public class UtilsTests
+    public class JsonUtilsTest
     {
         private JsonElement Json { get { return R.JsonFromFile("data/utils.json"); } }
 
@@ -30,6 +30,26 @@ namespace TemplateGO.Tests
 
             var array = JsonUtils.GetValue(Json, "parents") as JsonElement?;
             Assert.AreEqual(array?.ValueKind, JsonValueKind.Array);
+        }
+
+        [TestMethod()]
+        public void GetValueFromArrayTest()
+        {
+            // 数组对象
+            var arr1 = Json.GetProperty("parents");
+            Assert.AreEqual("父亲姓名", JsonUtils.GetValue(arr1, "[0].name"));
+            Assert.AreEqual(50, JsonUtils.GetValue(arr1, "[1].age"));
+
+            Assert.AreEqual("父亲姓名", JsonUtils.GetValue(Json, "parents[0].name"));
+            Assert.AreEqual(50, JsonUtils.GetValue(Json, "parents[1].age"));
+
+            // 经数组元素
+            var arr2 = Json.GetProperty("favorites");
+            Assert.AreEqual("music", JsonUtils.GetValue(arr2, "[0]"));
+            Assert.AreEqual("move", JsonUtils.GetValue(arr2, "[1]"));
+
+            Assert.AreEqual("music", JsonUtils.GetValue(Json, "favorites[0]"));
+            Assert.AreEqual("move", JsonUtils.GetValue(Json, "favorites[1]"));
         }
 
         [TestMethod()]
