@@ -23,10 +23,10 @@ namespace TemplateGO.Tests.Parser
         {
             var parser = new Grammar("${}");
             Assert.IsNotNull(parser);
-            Assert.AreEqual(parser.Origin, "${}");
-            Assert.AreEqual(parser.Property, "");
-            Assert.AreEqual(parser.Processor, Processor.ProcessorType.Value);
-            Assert.AreEqual(parser.Options.Count, 0);
+            Assert.AreEqual("${}", parser.Origin);
+            Assert.AreEqual("", parser.Property);
+            Assert.AreEqual(Processor.ProcessorType.Value, parser.Processor);
+            Assert.AreEqual(0, parser.Options.Count);
         }
 
         [TestMethod()]
@@ -34,10 +34,10 @@ namespace TemplateGO.Tests.Parser
         {
             var parser = new Grammar("${hello}");
             Assert.IsNotNull(parser);
-            Assert.AreEqual(parser.Origin, "${hello}");
-            Assert.AreEqual(parser.Property, "hello");
-            Assert.AreEqual(parser.Processor, Processor.ProcessorType.Value);
-            Assert.AreEqual(parser.Options.Count, 0);
+            Assert.AreEqual("${hello}", parser.Origin);
+            Assert.AreEqual("hello", parser.Property);
+            Assert.AreEqual(Processor.ProcessorType.Value, parser.Processor);
+            Assert.AreEqual(0, parser.Options.Count);
         }
 
         [TestMethod()]
@@ -45,10 +45,10 @@ namespace TemplateGO.Tests.Parser
         {
             var parser = new Grammar("${ hello | test }");
             Assert.IsNotNull(parser);
-            Assert.AreEqual(parser.Origin, "${ hello | test }");
-            Assert.AreEqual(parser.Property, "hello");
-            Assert.AreEqual(parser.Processor, "test");
-            Assert.AreEqual(parser.Options.Count, 0);
+            Assert.AreEqual("${ hello | test }", parser.Origin);
+            Assert.AreEqual("hello", parser.Property);
+            Assert.AreEqual("test", parser.Processor);
+            Assert.AreEqual(0, parser.Options.Count);
         }
 
         [TestMethod()]
@@ -56,15 +56,15 @@ namespace TemplateGO.Tests.Parser
         {
             var parser = new Grammar("${hello| test : flag, user = yang , name = 123}");
             Assert.IsNotNull(parser);
-            Assert.AreEqual(parser.Origin, "${hello| test : flag, user = yang , name = 123}");
-            Assert.AreEqual(parser.Property, "hello");
-            Assert.AreEqual(parser.Processor, "test");
+            Assert.AreEqual("${hello| test : flag, user = yang , name = 123}", parser.Origin);
+            Assert.AreEqual("hello", parser.Property);
+            Assert.AreEqual("test", parser.Processor);
 
             // 检查选项
-            Assert.AreEqual(parser.Options.Count, 3);
-            Assert.AreEqual(parser.Options["flag"], "");
-            Assert.AreEqual(parser.Options["user"], "yang");
-            Assert.AreEqual(parser.Options["name"], "123");
+            Assert.AreEqual(3, parser.Options.Count);
+            Assert.AreEqual("", parser.Options["flag"]);
+            Assert.AreEqual("yang", parser.Options["user"]);
+            Assert.AreEqual("123", parser.Options["name"]);
         }
 
         [TestMethod()]
@@ -72,15 +72,34 @@ namespace TemplateGO.Tests.Parser
         {
             var parser = new Grammar("${|test:flag,user=yang,name=123}");
             Assert.IsNotNull(parser);
-            Assert.AreEqual(parser.Origin, "${|test:flag,user=yang,name=123}");
-            Assert.AreEqual(parser.Property, "");
-            Assert.AreEqual(parser.Processor, "test");
+            Assert.AreEqual("${|test:flag,user=yang,name=123}", parser.Origin);
+            Assert.AreEqual("", parser.Property);
+            Assert.AreEqual("test", parser.Processor);
 
             // 检查选项
-            Assert.AreEqual(parser.Options.Count, 3);
-            Assert.AreEqual(parser.Options["flag"], "");
-            Assert.AreEqual(parser.Options["user"], "yang");
-            Assert.AreEqual(parser.Options["name"], "123");
+            Assert.AreEqual(3, parser.Options.Count);
+            Assert.AreEqual("", parser.Options["flag"]);
+            Assert.AreEqual("yang", parser.Options["user"]);
+            Assert.AreEqual("123", parser.Options["name"]);
+        }
+
+        [DataRow("${ prop }", "prop", "value", "", 0)]
+        [DataRow("${}", "", "value", "", 0)]
+        [DataRow("${|test}", "", "test", "", 0)]
+        [DataRow("${|test|t1|t2}", "", "test", "t1,t2", 0)]
+        [DataRow("${ prop | test | t1 | t2 : flag }", "prop", "test", "t1,t2", 1)]
+        [DataRow("${ prop | | t1 | t2 : flag,user=yang }", "prop", "value", "t1,t2", 2)]
+        [TestMethod()]
+        public void GrammarTestWithTransform(string input, string property, string processor, string transforms, int optionCount)
+        {
+            var parser = new Grammar(input);
+            Assert.IsNotNull(parser);
+            Assert.AreEqual(property, parser.Property);
+            Assert.AreEqual(processor, parser.Processor);
+            Assert.AreEqual(optionCount, parser.Options.Count);
+
+            // 转换器
+            Assert.AreEqual(transforms, string.Join(',', parser.Transforms));
         }
     }
 }
