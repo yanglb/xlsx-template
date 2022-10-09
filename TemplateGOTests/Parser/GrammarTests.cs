@@ -33,6 +33,8 @@ namespace TemplateGO.Tests.Parser
         }
 
         [DataRow("", null)]
+        [DataRow(null, null)]
+        [DataRow("${hel", null)]
         [DataRow("${}", "${}")]
         [DataRow("${prop|proc|t1|t2:k=v,k2=v2}", "${prop|proc|t1|t2:k=v,k2=v2}")]
         [DataRow("T${prop|proc|t1|t2:k=v,k2=v2}", "${prop|proc|t1|t2:k=v,k2=v2}")]
@@ -43,13 +45,13 @@ namespace TemplateGO.Tests.Parser
         public void MatchesTest(string input, string? matchs)
         {
             var res = Grammar.Matches(input);
-            Assert.IsNotNull(res);
             if (matchs == null)
             {
-                Assert.AreEqual(0, res.Count);
+                Assert.IsNull(res);
             }
             else
             {
+                Assert.IsNotNull(res);
                 Assert.AreEqual(matchs, string.Join(',', res.Select(r => r.Value)));
             }
         }

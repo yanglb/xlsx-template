@@ -25,9 +25,12 @@ namespace TemplateGO.Parser
         /// </summary>
         /// <param name="input">输入内容</param>
         /// <returns>符合要求的标记块</returns>
-        public static MatchCollection Matches(string input)
+        public static MatchCollection? Matches(string? input)
         {
+            if (string.IsNullOrEmpty(input)) return null;
+
             var matchs = Regex.Matches(input, @"\${([^}]*)*}");
+            if (matchs.Count == 0) return null;
             return matchs;
         }
 
