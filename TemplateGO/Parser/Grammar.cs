@@ -37,18 +37,29 @@ namespace TemplateGO.Parser
         /// <summary>
         /// 解析器语法
         /// </summary>
-        public Grammar(string content)
+        public Grammar(string content, bool isTable = false)
         {
-            if (!content.StartsWith("${") || !content.EndsWith("}"))
+            if (!isTable && (!content.StartsWith("${") || !content.EndsWith("}")))
             {
                 throw new ArgumentException($"语法错误: {content}");
             }
 
             // 原始内容
             Origin = content;
+            Property = string.Empty;
+            Processor = ProcessorType.Value;
+            Transforms = Array.Empty<string>();
+            Options = new Dictionary<string, string>();
+
+            // 公式不可用指定任何其它内容
+            if (isTable && content.StartsWith('='))
+            {
+                Property = content;
+                return;
+            }
 
             // 删除 ${} 字符
-            var values = content[2..^1];
+            var values = isTable ? content : content[2..^1];
 
             // 属性|处理器|转换器 : 选项
             var optsIdx = values.IndexOf(':');
@@ -100,6 +111,9 @@ namespace TemplateGO.Parser
         /// </summary>
         public string Processor { get; private set; }
 
+        /// <summary>
+        /// 选项
+        /// </summary>
         public Dictionary<string, string> Options { get; private set; }
     }
 }

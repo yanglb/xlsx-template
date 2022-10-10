@@ -140,5 +140,23 @@ namespace TemplateGO.Tests.Parser
             // 转换器
             Assert.AreEqual(transforms, string.Join(',', parser.Transforms));
         }
+
+        [DataRow("prop", "prop", "value", "", 0)]
+        [DataRow("=prop|link|eval|t2:k=v,k2=v2", "=prop|link|eval|t2:k=v,k2=v2", "value", "", 0)]
+        [DataRow("=:prop|link|eval|t2:k=v,k2=v2", "=:prop|link|eval|t2:k=v,k2=v2", "value", "", 0)]
+        [DataRow("prop|link|eval|t2:k=v,k2=v2", "prop", "link", "eval,t2", 2)]
+        [DataRow("#prop|image|eval|t2:k,k2=v2", "#prop", "image", "eval,t2", 2)]
+        [TestMethod()]
+        public void GrammarTestWithTable(string input, string property, string processor, string transforms, int optionCount)
+        {
+            var parser = new Grammar(input, true);
+            Assert.IsNotNull(parser);
+            Assert.AreEqual(property, parser.Property);
+            Assert.AreEqual(processor, parser.Processor);
+            Assert.AreEqual(optionCount, parser.Options.Count);
+
+            // 转换器
+            Assert.AreEqual(transforms, string.Join(',', parser.Transforms));
+        }
     }
 }
