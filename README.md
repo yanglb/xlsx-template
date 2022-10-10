@@ -227,16 +227,21 @@ TemplateRender.Render("template.xlsx", data, "out.xlsx", new TemplateOptions()
 #### columns列选项
 定义表格中每一列要插入的内容或属性名。
 
-| column值 | 名称 | 示例 | 说明 |
-| --- | --- | --- | -- |
-| #index | 索引 | 0 | 此列插入数组索引值，从0开始。 |
-| #seq | 序列 | 1 | 此列插入数组序列值，从1开始。 #seq = #index + 1 。|
-| #row | 行号 | 1 | 此例插入行号。 |
-| #value | 值 | "张三" | 此列插入数组值，用于插入非Object/Array类型的列表数据。 |
-| =formulaProperty | 公式属性 | =sumScore | 获取JSON数据中formulaProperty所指内容并作为公式插入到此列中。 |
-| =:formual | 字符公式 | =:SUM(表1[[#This Row],[语文]:[英语]]) | 将 formual 作为公式插入到此列中。 |
-| - | 留空 | | 此列留空不插入任何内容。 |
-| _property_ | 属性 | name | 通过 property 属性获取数组中当前对象的值，并插入此列。|
+##### 语法
+> column|processor[|transform][:options]
+>
+> 目前 processor 仅支持 value
+
+| column值 | 名称 | 处理器 | 转换器 | 示例 | 说明 |
+| --- | --- | --- | -- | -- | -- |
+| #index | 索引 | value | 支持 | 0 | 此列插入数组索引值，从0开始。 |
+| #seq | 序列 | value | 支持 | 1 | 此列插入数组序列值，从1开始。 #seq = #index + 1 。|
+| #row | 行号 | value | 支持 | 1 | 此例插入行号。 |
+| #value | 值 | value | 支持 | "张三" | 此列插入数组值，用于插入非Object/Array类型的列表数据。 |
+| =formulaProperty | 公式属性 | value | 不支持 | =sumScore | 获取JSON数据中formulaProperty所指内容并作为公式插入到此列中。 |
+| =:formual | 字符公式 | value | 不支持 | =:SUM(表1[[#This Row],[语文]:[英语]]) | 将 formual 作为公式插入到此列中。 |
+| - | 留空 | | | | 此列留空不插入任何内容。 |
+| _property_ | 属性 | value | 支持 | name | 通过 property 属性获取数组中当前对象的值，并插入此列。|
 
 > 当插入字符公式时（=:formual）以下字符会替换为相应值
 > * #index
