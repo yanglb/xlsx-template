@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.Json;
 using TemplateGO.Parser;
+using TemplateGO.Transform;
 using TemplateGO.Utils;
 
 namespace TemplateGO.Processor
@@ -22,7 +23,7 @@ namespace TemplateGO.Processor
             var config = GetTableConfig(p, options);
 
             // 填充数据
-            FillData(value, p, config, options);
+            FillData(value, p, config, options, p.Options);
         }
 
         private JsonElement? GetListValue(ProcessParams p)
@@ -62,7 +63,16 @@ namespace TemplateGO.Processor
             foreach (var cell in cells)
             {
                 var value = CellUtils.GetCellString(cell, p.SharedStringTable);
-                tableConfig.KeyMap.Add(CellUtils.ColumnReference(cell.CellReference!), value);
+
+                // 空白列
+                if(string.IsNullOrEmpty(value) || value == "-") continue;
+
+                var grammar = new Grammar(value, true);
+                if (grammar.Processor != ProcessorType.Value)
+                {
+                    throw new NotImplementedException($"暂未实现在表格中插入 {grammar.Processor} 类型的数据");
+                }
+                tableConfig.KeyMap.Add(CellUtils.ColumnReference(cell.CellReference!), grammar);
             }
 
             // 数据开始行编号 当前Cell + 列属性 + 标题行数目
@@ -130,7 +140,7 @@ namespace TemplateGO.Processor
             /// key为列名，如A/B/C等
             /// value为属性名
             /// </summary>
-            public Dictionary<string, string> KeyMap = new();
+            public Dictionary<string, Grammar> KeyMap = new();
 
             /// <summary>
             /// 开始行，下标从1开始 如 A1 表示第1行
@@ -154,7 +164,7 @@ namespace TemplateGO.Processor
         }
 
 
-        private void FillData(JsonElement? data, ProcessParams p, TableConfig config, TableOptions options)
+        private void FillData(JsonElement? data, ProcessParams p, TableConfig config, TableOptions options, TemplateOptions templateOptions)
         {
             // 空数据视为 []
             data ??= JsonDocument.Parse(@"[]")!.RootElement;
@@ -187,11 +197,11 @@ namespace TemplateGO.Processor
                 foreach (var col in config.KeyMap)
                 {
                     var columnRef = col.Key;
-                    var propName = col.Value;
+                    var grammar = col.Value;
 
                     // 内容
-                    object? cellValue = GetCellValue(value, propName, idx, rowIndex);
-                    var isFormula = propName.StartsWith("=");
+                    object? cellValue = GetCellValueAndTransform(value, grammar, idx, rowIndex, templateOptions);
+                    var isFormula = grammar.Origin.StartsWith("=");
 
                     // 设置单元格内容
                     var cellReference = $"{columnRef}{rowIndex}";
@@ -328,14 +338,18 @@ namespace TemplateGO.Processor
             CellUtils.MoveCellAnchor(p.WorksheetPart, shift, range);
         }
 
-        private static object? GetCellValue(JsonElement data, string propName, uint index, uint rowNumber)
+        private static object? GetCellValueAndTransform(JsonElement data, Grammar grammar, uint index, uint rowNumber, TemplateOptions options) {
+            var value = GetCellValue(data, grammar, index, rowNumber);
+            value = ValueTransform.Transform(value, grammar, options);
+            return value;
+        }
+
+        private static object? GetCellValue(JsonElement data, Grammar grammar, uint index, uint rowNumber)
         {
             // 内容
             object? cellValue = null;
-            switch (propName)
+            switch (grammar.Property)
             {
-                case "-":
-                    break;
                 case "#index":
                     cellValue = index;
                     break;
@@ -351,22 +365,23 @@ namespace TemplateGO.Processor
 
                 default:
                     {
-                        if (propName.StartsWith("=:"))
+                        var property = grammar.Property;
+                        if (property.StartsWith("=:"))
                         {
-                            var formual = propName[2..];
-                            formual = formual.Replace("#row", $"{rowNumber}");
+                            var formual = property[2..];
                             formual = formual.Replace("#index", $"{index}");
                             formual = formual.Replace("#seq", $"{index + 1}");
+                            formual = formual.Replace("#row", $"{rowNumber}");
                             return formual.Trim();
                         }
-                        else if (propName.StartsWith("="))
+                        else if (property.StartsWith("="))
                         {
-                            propName = propName[1..].Trim();
+                            property = property[1..].Trim();
                         }
 
                         try
                         {
-                            cellValue = JsonUtils.GetValue(data, propName);
+                            cellValue = JsonUtils.GetValue(data, property);
                         }
                         catch { }
                     }

@@ -17,7 +17,13 @@ namespace TemplateGO.Tests
         public void TableTest()
         {
             var outFile = R.OutFullPath("table-out.xlsx");
-            TemplateRender.Render(R.FullPath("data/table.xlsx"), R.JsonFromFile("data/table.json"), outFile);
+            TemplateRender.Render(R.FullPath("data/table.xlsx"), R.JsonFromFile("data/table.json"), outFile, new TemplateOptions()
+            {
+                Transforms = new Dictionary<string, TransformDelegate>() 
+                {
+                    { "eval", EvalTransform }
+                }
+            });
 
             // 应该能打开文档
             using var doc = SpreadsheetDocument.Open(outFile, false);
@@ -25,7 +31,33 @@ namespace TemplateGO.Tests
             Assert.IsNotNull(doc.WorkbookPart);
             var sheets = doc.WorkbookPart.Workbook.Descendants<Sheet>();
             Assert.IsNotNull(sheets);
+
+            // 检查D列数据是否正常
+            var sheetPart = doc.WorkbookPart.GetPartById(sheets.FirstOrDefault()!.Id!) as WorksheetPart;
+            var shareStringTable = doc.WorkbookPart.SharedStringTablePart?.SharedStringTable;
+            Assert.IsNotNull(sheetPart);
+
+            var nameExpected = "贾阳煦,钟惠玲,孟三春,边念蕾,终苏凌,勾融雪,甄映寒,濮高寒,范弘致,公冰洁";
+            var names = string.Join(',', ColumnStrings(sheetPart.Worksheet, shareStringTable, "D", 7, 16));
+            Assert.AreEqual(nameExpected, names);
+
+            var evalExpected = "良,良,优,良,中,良,良,中,优,良";
+            var eval = string.Join(',', ColumnStrings(sheetPart.Worksheet, shareStringTable, "H", 7, 16));
+            Assert.AreEqual(evalExpected, eval);
         }
+
+        private object? EvalTransform(object? value, TransformOptions options)
+        {
+            if (value == null) return null;
+            if (value is int intValue)
+            {
+                if (intValue >= 90) return "优";
+                if (intValue >= 80) return "良";
+                return "中";
+            }
+            return value;
+        }
+
 
         // 图表测试
         [TestMethod()]
@@ -100,14 +132,14 @@ namespace TemplateGO.Tests
 
             // 所有人名
             var names = new List<string>();
-            foreach(var item in json.GetProperty("data").EnumerateArray())
+            foreach (var item in json.GetProperty("data").EnumerateArray())
             {
                 names.Add(item.GetProperty("name").ToString());
             }
 
             // 使用表格!D4:D203所有数据
             var names1 = new List<string>();
-            for(var row=4; row<=203; row++)
+            for (var row = 4; row <= 203; row++)
             {
                 names1.Add(R.CellStringValue(doc, "使用表格", $"D{row}")!);
             }
@@ -210,10 +242,14 @@ namespace TemplateGO.Tests
             Assert.AreEqual(englishExpected, englishs);
         }
 
-        private string[] ColumnStrings(Worksheet worksheet, SharedStringTable? sharedStringTable, string columnName, int startRow)
+        private string[] ColumnStrings(Worksheet worksheet, SharedStringTable? sharedStringTable, string columnName, int startRow, int? endRow = null)
         {
             var res = worksheet.Descendants<Cell>()
-                .Where(r => r.CellReference!.Value!.StartsWith(columnName) && (r.Parent as Row)!.RowIndex!.Value >= startRow)
+                .Where(r => 
+                    r.CellReference!.Value!.StartsWith(columnName) && 
+                    (r.Parent as Row)!.RowIndex!.Value >= startRow &&
+                    (endRow == null || (r.Parent as Row)!.RowIndex!.Value <= endRow)
+                )
                 .Select(r => CellUtils.GetCellString(r, sharedStringTable))
                 .ToArray();
 
