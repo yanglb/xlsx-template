@@ -11,9 +11,9 @@
     <PackageReadmeFile></PackageReadmeFile>
     <Authors>yanglb</Authors>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <version>1.1.0</version>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
-    <FileVersion>1.1.0.0</FileVersion>
+    <version>1.1.1</version>
+    <AssemblyVersion>1.1.1.0</AssemblyVersion>
+    <FileVersion>1.1.1.0</FileVersion>
     <Title>TemplateGO</Title>
   </PropertyGroup>
 
