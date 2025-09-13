@@ -99,9 +99,16 @@ namespace XlsxTemplate.Utils
         /// <param name="imageFile">图片文件</param>
         public static ImageShapeInfo GetImageShape(ImageOptions options, string imageFile)
         {
-            using var stream = File.OpenRead(imageFile);
-            using var codec = SKCodec.Create(stream);
-            return GetImageShape(options, codec.Info.Width, codec.Info.Height);
+            int width = 120, height = 120;
+            try
+            {
+                using var stream = File.OpenRead(imageFile);
+                using var codec = SKCodec.Create(stream);
+                width = codec.Info.Width;
+                height = codec.Info.Height;
+            }
+            catch { }
+            return GetImageShape(options, width, height);
         }
 
         /// <summary>
@@ -115,9 +122,11 @@ namespace XlsxTemplate.Utils
             var wEmu = (long)new Pixel(width).ToEmu().Value;
             var hEmu = (long)new Pixel(height).ToEmu().Value;
 
-            var imageShape = new ImageShapeInfo();
-            imageShape.X = options.Padding;
-            imageShape.Y = options.Padding;
+            var imageShape = new ImageShapeInfo
+            {
+                X = options.Padding,
+                Y = options.Padding
+            };
 
             // 未指定宽度及高度 使用图片大小
             if (options.FrameWidth == null && options.FrameHeight == null)
