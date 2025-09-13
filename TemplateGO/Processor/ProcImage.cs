@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
@@ -55,7 +55,7 @@ namespace TemplateGO.Processor
             return ImageUtils.ToLocalFile(finalImage);
         }
 
-        private void DeleteImage(Cell cell, WorksheetPart worksheetPart)
+        private static void DeleteImage(Cell cell, WorksheetPart worksheetPart)
         {
             var row = CellUtils.RowValue(cell.CellReference!) - 1;
             var column = CellUtils.ColumnValue(cell.CellReference!) - 1;
@@ -91,7 +91,7 @@ namespace TemplateGO.Processor
             }
         }
 
-        private void AddImage(Cell cell, WorksheetPart worksheetPart, string imageFile, ImageOptions options)
+        private static void AddImage(Cell cell, WorksheetPart worksheetPart, string imageFile, ImageOptions options)
         {
             var drawingsPart = worksheetPart.DrawingsPart ?? worksheetPart.AddNewPart<DrawingsPart>();
             if (!worksheetPart.Worksheet.ChildElements.OfType<Drawing>().Any())
