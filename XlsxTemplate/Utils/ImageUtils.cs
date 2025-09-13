@@ -1,7 +1,7 @@
 using DocumentFormat.OpenXml.Packaging;
 using dotnetCampus.OpenXmlUnitConverter;
 using QRCoder;
-using SixLabors.ImageSharp;
+using SkiaSharp;
 using System.Text.RegularExpressions;
 using XlsxTemplate.Parser;
 
@@ -99,8 +99,9 @@ namespace XlsxTemplate.Utils
         /// <param name="imageFile">图片文件</param>
         public static ImageShapeInfo GetImageShape(ImageOptions options, string imageFile)
         {
-            using var imgInfo = Image.Load(imageFile);
-            return GetImageShape(options, imgInfo.Width, imgInfo.Height);
+            using var stream = File.OpenRead(imageFile);
+            using var codec = SKCodec.Create(stream);
+            return GetImageShape(options, codec.Info.Width, codec.Info.Height);
         }
 
         /// <summary>
