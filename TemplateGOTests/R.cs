@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.IO;
@@ -64,6 +64,20 @@ namespace TemplateGOTests
             if (cell == null) throw new ArgumentException($"{sheetName} 中不存在 {cellReference}");
 
             return CellUtils.GetCellString(cell, shareStringTable);
+        }
+
+        internal static string[] ColumnStrings(Worksheet worksheet, SharedStringTable? sharedStringTable, string columnName, int startRow, int? endRow = null)
+        {
+            var res = worksheet.Descendants<Cell>()
+                .Where(r =>
+                    r.CellReference!.Value!.StartsWith(columnName) &&
+                    (r.Parent as Row)!.RowIndex!.Value >= startRow &&
+                    (endRow == null || (r.Parent as Row)!.RowIndex!.Value <= endRow)
+                )
+                .Select(r => CellUtils.GetCellString(r, sharedStringTable))
+                .ToArray();
+
+            return res;
         }
     }
 }

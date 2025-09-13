@@ -1,10 +1,9 @@
-﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TemplateGO.Utils;
 using TemplateGOTests;
 
 namespace TemplateGO.Tests
@@ -38,11 +37,11 @@ namespace TemplateGO.Tests
             Assert.IsNotNull(sheetPart);
 
             var nameExpected = "贾阳煦,钟惠玲,孟三春,边念蕾,终苏凌,勾融雪,甄映寒,濮高寒,范弘致,公冰洁";
-            var names = string.Join(',', ColumnStrings(sheetPart.Worksheet, shareStringTable, "D", 7, 16));
+            var names = string.Join(',', R.ColumnStrings(sheetPart.Worksheet, shareStringTable, "D", 7, 16));
             Assert.AreEqual(nameExpected, names);
 
             var evalExpected = "良,良,优,良,中,良,良,中,优,良";
-            var eval = string.Join(',', ColumnStrings(sheetPart.Worksheet, shareStringTable, "H", 7, 16));
+            var eval = string.Join(',', R.ColumnStrings(sheetPart.Worksheet, shareStringTable, "H", 7, 16));
             Assert.AreEqual(evalExpected, eval);
         }
 
@@ -199,7 +198,7 @@ namespace TemplateGO.Tests
             Assert.IsNotNull(sheetPart);
 
             var nameExpected = "贾阳煦,钟惠玲,孟三春,边念蕾,终苏凌,勾融雪,甄映寒,濮高寒,范弘致,公冰洁";
-            var names = string.Join(',', ColumnStrings(sheetPart.Worksheet, shareStringTable, "D", 5));
+            var names = string.Join(',', R.ColumnStrings(sheetPart.Worksheet, shareStringTable, "D", 5));
             Assert.AreEqual(nameExpected, names);
         }
 
@@ -229,31 +228,17 @@ namespace TemplateGO.Tests
             var mathExpected = "71,61,81,67,72,99,69,90,79,86";
             var englishExpected = "84,82,93,85,70,89,80,74,100,86";
 
-            var names = string.Join(',', ColumnStrings(sheetPart.Worksheet, shareStringTable, "D", 5));
+            var names = string.Join(',', R.ColumnStrings(sheetPart.Worksheet, shareStringTable, "D", 5));
             Assert.AreEqual(nameExpected, names);
 
-            var languages = string.Join(',', ColumnStrings(sheetPart.Worksheet, shareStringTable, "E", 5));
+            var languages = string.Join(',', R.ColumnStrings(sheetPart.Worksheet, shareStringTable, "E", 5));
             Assert.AreEqual(languageExpected, languages);
 
-            var maths = string.Join(',', ColumnStrings(sheetPart.Worksheet, shareStringTable, "F", 5));
+            var maths = string.Join(',', R.ColumnStrings(sheetPart.Worksheet, shareStringTable, "F", 5));
             Assert.AreEqual(mathExpected, maths);
 
-            var englishs = string.Join(',', ColumnStrings(sheetPart.Worksheet, shareStringTable, "G", 5));
+            var englishs = string.Join(',', R.ColumnStrings(sheetPart.Worksheet, shareStringTable, "G", 5));
             Assert.AreEqual(englishExpected, englishs);
-        }
-
-        private string[] ColumnStrings(Worksheet worksheet, SharedStringTable? sharedStringTable, string columnName, int startRow, int? endRow = null)
-        {
-            var res = worksheet.Descendants<Cell>()
-                .Where(r => 
-                    r.CellReference!.Value!.StartsWith(columnName) && 
-                    (r.Parent as Row)!.RowIndex!.Value >= startRow &&
-                    (endRow == null || (r.Parent as Row)!.RowIndex!.Value <= endRow)
-                )
-                .Select(r => CellUtils.GetCellString(r, sharedStringTable))
-                .ToArray();
-
-            return res;
         }
     }
 }
