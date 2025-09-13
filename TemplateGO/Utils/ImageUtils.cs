@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Packaging;
 using dotnetCampus.OpenXmlUnitConverter;
 using QRCoder;
 using SixLabors.ImageSharp;
@@ -63,7 +63,7 @@ namespace TemplateGO.Utils
         }
 
         // 代码来自 ImagePartTypeInfo
-        public static ImagePartType GetImagePartType(string extension)
+        public static PartTypeInfo GetImagePartType(string extension)
         {
             switch (extension.ToLower())
             {
