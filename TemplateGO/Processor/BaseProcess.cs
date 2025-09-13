@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TemplateGO.Parser;
@@ -41,11 +41,17 @@ namespace TemplateGO.Processor
         /// 获取无需转换的内容
         /// </summary>
         /// <param name="data">JSON数据</param>
-        /// <param name="property">属性名</param>
+        /// <param name="property">属性名，如果包裹在又引号中则视为直接内容</param>
         protected object? GetValueByProperty(JsonElement data, string? property)
         {
             try
             {
+                // 如果属性包裹在""中则视为值
+                if (!string.IsNullOrEmpty(property))
+                {
+                    var p = property.Trim();
+                    if (p.StartsWith('"') && p.EndsWith('"')) return p[1..^1];
+                }
                 // 否则获取内容
                 return JsonUtils.GetValue(data, property);
             }
