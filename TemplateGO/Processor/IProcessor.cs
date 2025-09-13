@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.Json;
 using TemplateGO.Parser;
@@ -27,6 +27,11 @@ namespace TemplateGO.Processor
         public SharedStringTable? SharedStringTable { get; set; }
         public WorkbookPart WorkbookPart { get; set; }
         public WorksheetPart WorksheetPart { get; set; }
+
+        /// <summary>
+        /// 是否在处理表格Table
+        /// </summary>
+        public bool InTable {  get; set; }
 
         public TemplateOptions Options { get; set; }
     }
