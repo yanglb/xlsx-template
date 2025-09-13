@@ -1,7 +1,6 @@
-﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using DocumentFormat.OpenXml.Wordprocessing;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TemplateGO.Parser;
@@ -28,6 +27,8 @@ namespace TemplateGO.Renders
             { ".xlam", SpreadsheetDocumentType.AddIn },
         };
 
+        private bool processedTable = false;
+
         public void Render(string templatePath, JsonElement data, string? targetType, TemplateOptions options)
         {
             using SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(templatePath, true);
@@ -37,8 +38,8 @@ namespace TemplateGO.Renders
             if (string.Compare(Path.GetExtension(templatePath), newType, true) != 0)
             {
                 Console.WriteLine($"转换文件类型为 {newType}");
-                if (!SheetTypeMap.ContainsKey(newType)) throw new ArgumentException($"未知的目标文档类型 {newType}");
-                spreadsheetDocument.ChangeDocumentType(SheetTypeMap[newType]);
+                if (!SheetTypeMap.TryGetValue(newType, out SpreadsheetDocumentType value)) throw new ArgumentException($"未知的目标文档类型 {newType}");
+                spreadsheetDocument.ChangeDocumentType(value);
                 spreadsheetDocument.Save();
             }
 
@@ -47,15 +48,14 @@ namespace TemplateGO.Renders
             var stringTable = workbookPart.GetPartsOfType<SharedStringTablePart>().FirstOrDefault()?.SharedStringTable;
 
             // 处理全部Sheet
-            var sheets = workbookPart.Workbook.Descendants<Sheet>();
-            if (sheets == null) throw new ArgumentException("模板格式错误: Sheet 为空");
+            var sheets = workbookPart.Workbook.Descendants<Sheet>() ?? throw new ArgumentException("模板格式错误: Sheet 为空");
             foreach (var sheet in sheets)
             {
                 ReplaceSheet(workbookPart, sheet, data, stringTable, options);
             }
 
             // 如果处理过表格则删除计算链
-            if (ProcessorCache.ContainsKey(ProcessorType.Table))
+            if (processedTable)
             {
                 var chainPart = workbookPart.CalculationChainPart;
                 if (chainPart != null) workbookPart.DeletePart(chainPart);
@@ -67,21 +67,6 @@ namespace TemplateGO.Renders
             // 保存工作表
             workbookPart.Workbook.Save();
             spreadsheetDocument.Save();
-        }
-
-        /// <summary>
-        /// 处理器缓存
-        /// </summary>
-        private Dictionary<string, IProcessor?> ProcessorCache = new();
-        private IProcessor? ProcessorByType(string type)
-        {
-            if (!ProcessorCache.ContainsKey(type))
-            {
-                var processor = Processor.Processor.ProcessorByType(type);
-                ProcessorCache[type] = processor;
-            }
-
-            return ProcessorCache[type];
         }
 
         /// <summary>
@@ -180,8 +165,9 @@ namespace TemplateGO.Renders
                 foreach (var match in matchs.Cast<Match>())
                 {
                     var parser = new Grammar(match.Value);
-                    var processor = ProcessorByType(parser.Processor);
+                    var processor = Processor.Processor.ProcessorByTypeWithCache(parser.Processor);
                     if (processor == null) continue;
+                    if (parser.Processor == ProcessorType.Table) processedTable = true;
 
                     // 处理
                     processor.Process(new ProcessParams()
