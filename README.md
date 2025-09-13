@@ -154,8 +154,8 @@ TemplateRender.Render("template.xlsx", data, "out.xlsx", new TemplateOptions()
 ```
 | 标记块 | 输出 | 说明 |
 | ----  | ---- | ---- |
-| ${url\|link:title} | [Home Page](https://yanglb.com) | 输出超链接 |
-| ${url\|link:"Test Page"} | [Test Page](https://yanglb.com) | 输出超链接 |
+| ${url\|link:content=title} | [Home Page](https://yanglb.com) | 输出超链接 |
+| ${url\|link:content="Test Page"} | [Test Page](https://yanglb.com) | 输出超链接 |
 | My Home Page${url\|link} | [My Home Page](https://yanglb.com) | **Excel 特有用法** Excel将超链接作用到单元格之上，因此整个单元格可点击。 |
 
 ### image 图片
