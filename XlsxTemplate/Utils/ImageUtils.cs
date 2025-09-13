@@ -1,7 +1,7 @@
 using DocumentFormat.OpenXml.Packaging;
 using dotnetCampus.OpenXmlUnitConverter;
 using QRCoder;
-using SkiaSharp;
+using SixLabors.ImageSharp;
 using System.Text.RegularExpressions;
 using XlsxTemplate.Parser;
 
@@ -102,10 +102,9 @@ namespace XlsxTemplate.Utils
             int width = 120, height = 120;
             try
             {
-                using var stream = File.OpenRead(imageFile);
-                using var codec = SKCodec.Create(stream);
-                width = codec.Info.Width;
-                height = codec.Info.Height;
+                using var imgInfo = Image.Load(imageFile);
+                width = imgInfo.Width;
+                height = imgInfo.Height;
             }
             catch { }
             return GetImageShape(options, width, height);
