@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.Json;
 using TemplateGO.Parser;
 using TemplateGO.Transform;
@@ -65,10 +65,10 @@ namespace TemplateGO.Processor
                 var value = CellUtils.GetCellString(cell, p.SharedStringTable);
 
                 // 空白列
-                if(string.IsNullOrEmpty(value) || value == "-") continue;
+                if (string.IsNullOrEmpty(value) || value == "-") continue;
 
                 var grammar = new Grammar(value, true);
-                if (grammar.Processor != ProcessorType.Value)
+                if (grammar.Processor == ProcessorType.Table)
                 {
                     throw new NotImplementedException($"暂未实现在表格中插入 {grammar.Processor} 类型的数据");
                 }
@@ -163,7 +163,6 @@ namespace TemplateGO.Processor
             public uint SampleCount { get; set; } = 0;
         }
 
-
         private void FillData(JsonElement? data, ProcessParams p, TableConfig config, TableOptions options, TemplateOptions templateOptions)
         {
             // 空数据视为 []
@@ -199,10 +198,6 @@ namespace TemplateGO.Processor
                     var columnRef = col.Key;
                     var grammar = col.Value;
 
-                    // 内容
-                    object? cellValue = GetCellValueAndTransform(value, grammar, idx, rowIndex, templateOptions);
-                    var isFormula = grammar.Origin.StartsWith("=");
-
                     // 设置单元格内容
                     var cellReference = $"{columnRef}{rowIndex}";
                     var cell = row.Descendants<Cell>().Where(c => CellUtils.ColumnReference(c.CellReference!) == columnRef).FirstOrDefault();
@@ -213,14 +208,44 @@ namespace TemplateGO.Processor
                     }
                     cell.CellReference = cellReference;
 
-                    if (isFormula)
+                    if (grammar.Processor == ProcessorType.Value)
                     {
-                        cell.CellFormula = new CellFormula($"{cellValue}");
-                        cell.CellValue = null;
+                        // 内容
+                        object? cellValue = GetCellValueAndTransform(value, grammar, idx, rowIndex, templateOptions);
+                        var isFormula = grammar.Origin.StartsWith("=");
+
+                        if (isFormula)
+                        {
+                            cell.CellFormula = new CellFormula($"{cellValue}");
+                            cell.CellValue = null;
+                        }
+                        else
+                        {
+                            SetCellValueWithType(cell, cellValue);
+                        }
                     }
                     else
                     {
-                        SetCellValueWithType(cell, cellValue);
+                        var processor = Processor.ProcessorByTypeWithCache(grammar.Processor) ?? throw new NotImplementedException($"表格中暂未实现 {grammar.Processor} 处理功能。");
+
+                        // 表格中不保留原来的内容
+                        cell.CellValue = null;
+                        cell.CellFormula = null;
+
+                        // 处理
+                        processor.Process(new ProcessParams()
+                        {
+                            Cell = cell,
+                            OriginValue = "",
+                            Parser = grammar,
+                            Sheet = p.Sheet,
+                            Data = value,
+                            SharedStringTable = p.SharedStringTable,
+                            WorkbookPart = p.WorkbookPart,
+                            WorksheetPart = p.WorksheetPart,
+                            Options = p.Options,
+                            InTable = true,
+                        });
                     }
                 }
 
@@ -325,7 +350,7 @@ namespace TemplateGO.Processor
             }
 
             // 之前的表格区域
-            var range = $"{config.KeyMap.Keys.First()}{config.BeginRowIndex}:{config.KeyMap.Keys.Last()}{config.BeginRowIndex+config.SampleCount}";
+            var range = $"{config.KeyMap.Keys.First()}{config.BeginRowIndex}:{config.KeyMap.Keys.Last()}{config.BeginRowIndex + config.SampleCount}";
 
             // 更新图表引用
             CellUtils.UpdateChartReference(p.WorkbookPart, p.Sheet.Name!, shift, range);
@@ -338,7 +363,8 @@ namespace TemplateGO.Processor
             CellUtils.MoveCellAnchor(p.WorksheetPart, shift, range);
         }
 
-        private static object? GetCellValueAndTransform(JsonElement data, Grammar grammar, uint index, uint rowNumber, TemplateOptions options) {
+        private static object? GetCellValueAndTransform(JsonElement data, Grammar grammar, uint index, uint rowNumber, TemplateOptions options)
+        {
             var value = GetCellValue(data, grammar, index, rowNumber);
             value = ValueTransform.Transform(value, grammar, options);
             return value;
