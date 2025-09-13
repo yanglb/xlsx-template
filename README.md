@@ -19,7 +19,7 @@
 ### 安装
 ```sh
 # 支持 Windows、Linux、MacOS
-dotnet add package TemplateGO
+dotnet add package XlsxTemplate
 ```
 
 ### 使用
@@ -37,7 +37,7 @@ cd template-go
 dotnet build && dotnet test
 
 # 测试结果:
-ls -lh TemplateGOTests/out 
+ls -lh XlsxTemplateTests/out 
 ```
 
 ## 文档
@@ -45,7 +45,7 @@ ls -lh TemplateGOTests/out
 ${ **property** [| **processor** [| **transform**] [: **options** ]]}
 
 ### property 属性路径
-指示 TemplateGO 如何从JSON数据中获取要插入的内容。
+指示 XlsxTemplate 如何从JSON数据中获取要插入的内容。
 
 > property 为空字符串时直接返回 data 对象。
 
@@ -132,7 +132,7 @@ TemplateRender.Render("template.xlsx", data, "out.xlsx", new TemplateOptions()
 | Age: ${age} | Age: 18 | 单元格类型为 String |
 | ${graduated} | FALSE | 单元格类型为 Boolean |
 | Is Graduated: ${graduated} | IS Graduated: FALSE | 单元格类型为 String |
-| ${school} | [object Object] | TemplateGO 会将 JSON 中 Object或Array 转为 [object Object] 字符串。|
+| ${school} | [object Object] | XlsxTemplate 会将 JSON 中 Object或Array 转为 [object Object] 字符串。|
 | ${notExists} |  | JSON 中不存在的属性将不输出任何内容。 |
 
 **Excel:** 如果单元格仅包含该标记块，则单元格数据类型将根据JSON数据设置。

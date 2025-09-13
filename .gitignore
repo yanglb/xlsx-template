@@ -350,4 +350,4 @@ MigrationBackup/
 .ionide/
 
 # test result
-TemplateGOTests/out/*
+XlsxTemplateTests/out/*
