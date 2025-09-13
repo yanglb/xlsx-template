@@ -5,15 +5,15 @@
     "name":  "市一中"
   },
   "data": [
-    {"name": "贾阳煦", "language":85, "math":71, "english":84, "formula": "B7", "remark": "班长"},
-    {"name": "钟惠玲", "language":91, "math":61, "english":82, "formula": "B8"},
-    {"name": "孟三春", "language":96, "math":81, "english":93, "formula": "B9"},
-    {"name": "边念蕾", "language":81, "math":67, "english":85, "formula": "B10", "remark": "学习委员"},
-    {"name": "终苏凌", "language":95, "math":72, "english":70, "formula": "B11"},
-    {"name": "勾融雪", "language":76, "math":99, "english":89, "formula": "B12"},
-    {"name": "甄映寒", "language":62, "math":69, "english":80, "formula": "B13"},
-    {"name": "濮高寒", "language":67, "math":90, "english":74, "formula": "B14"},
-    {"name": "范弘致", "language":87, "math":79, "english":100, "formula": "B15"},
-    {"name": "公冰洁", "language":73, "math":86, "english":86, "formula": "B16"}
+    {"name": "贾阳煦", "avatar": "data/avatars/01.png", "language":85, "math":71, "english":84, "formula": "B7", "remark": "班长"},
+    {"name": "钟惠玲", "avatar": "data/avatars/02.png", "language":91, "math":61, "english":82, "formula": "B8"},
+    {"name": "孟三春", "avatar": "data/avatars/03.png", "language":96, "math":81, "english":93, "formula": "B9"},
+    {"name": "边念蕾", "avatar": "data/avatars/04.png", "language":81, "math":67, "english":85, "formula": "B10", "remark": "学习委员"},
+    {"name": "终苏凌", "avatar": "data/avatars/05.png", "language":95, "math":72, "english":70, "formula": "B11"},
+    {"name": "勾融雪", "avatar": "data/avatars/01.png", "language":76, "math":99, "english":89, "formula": "B12"},
+    {"name": "甄映寒", "avatar": "data/avatars/02.png", "language":62, "math":69, "english":80, "formula": "B13"},
+    {"name": "濮高寒", "avatar": "data/avatars/03.png", "language":67, "math":90, "english":74, "formula": "B14"},
+    {"name": "范弘致", "avatar": "data/avatars/04.png", "language":87, "math":79, "english":99, "formula": "B15"},
+    {"name": "公冰洁", "avatar": "data/avatars/05.png", "language":73, "math":86, "english":86, "formula": "B16"}
   ]
 }
