@@ -4,9 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageProjectUrl>https://github.com/yanglb/template-go</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/yanglb/xlsx-template</PackageProjectUrl>
     <Copyright>Copyright (c) yanglb.com. All rights reserved.</Copyright>
-    <RepositoryUrl>https://github.com/yanglb/template-go</RepositoryUrl>
+    <RepositoryUrl>https://github.com/yanglb/xlsx-template</RepositoryUrl>
     <Company>yanglb.com</Company>
     <PackageReadmeFile></PackageReadmeFile>
     <Authors>yanglb</Authors>
