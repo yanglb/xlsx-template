@@ -8,9 +8,9 @@
     <Copyright>Copyright (c) yanglb.com. All rights reserved.</Copyright>
     <RepositoryUrl>https://github.com/yanglb/xlsx-template</RepositoryUrl>
     <Company>yanglb.com</Company>
-    <PackageReadmeFile></PackageReadmeFile>
     <Authors>yanglb</Authors>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <version>2.0.0</version>
     <AssemblyVersion>2.0.0.0</AssemblyVersion>
     <FileVersion>2.0.0.0</FileVersion>
@@ -19,6 +19,10 @@
 
   <ItemGroup>
     <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
